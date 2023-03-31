@@ -1,0 +1,873 @@
+{
+  "swaggerVersion": "1.2",
+  "basePath": "https://jp-api4-stage.boku.com",
+  "resourcePath": "/",
+  "apis": [
+    {
+      "path": "/optin/3.0/optin",
+      "operations": [
+        {
+          "method": "POST",
+          "summary": "The 'optin' call initiates the consumer authentication process. After an `optin` call, an opt-in is usually in status `pending-validate`.\n\nThe optin call types are\n\n* 'hosted' - redirect the consumer to an issuer-provided UI to perform verification.\n\nThe 'optin' call is used in conjunction with the following related methods in order to complete consumer approval:\n\n* 'validate-optin' - identify and validate the billing account the consumer is registering as   their payment method.\n* 'confirm-optin' - confirm that the associated 'optin' should be activated for billing.\n\nIt is possible to restrict an optin to be used for a single charge by specifying the 'terms' element. When provided, the system will only allow a single 'charge' request to be made for this optin.",
+          "nickname": "optin",
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "description": "",
+              "paramType": "header",
+              "required": true,
+              "allowMultiple": false,
+              "defaultValue": "",
+              "enum": [
+                "application/xml"
+              ],
+              "uniqueItems": false,
+              "type": "string"
+            },
+            {
+              "name": "body",
+              "description": "",
+              "paramType": "body",
+              "required": true,
+              "allowMultiple": false,
+              "defaultValue": "",
+              "uniqueItems": false,
+              "type": "OptinRequest"
+            }
+          ],
+          "produces": [
+            "application/xml"
+          ],
+          "consumes": [
+            "application/xml"
+          ],
+          "responseMessages": [],
+          "uniqueItems": false,
+          "$ref": "OptinResponse"
+        }
+      ]
+    },
+    {
+      "path": "/optin/3.0/validate-optin",
+      "operations": [
+        {
+          "method": "POST",
+          "summary": "The main purpose of an opt-in is to identify and verify the payment method that the end-user wants to register. In the process, the user confirms that they have control over the corresponding payment method. Once an opt-in has begun via an `optin` API call, the `validate-optin` call is used to complete this verification and in most cases retrieve the end-user details such as the account identifier of the user.\n\nSpecifically\n\n* **hosted**: Confirm successful authentication via opt-in UI, and retrieve the account   identifier of the user.\n\nAfter a successful `validate-optin` call, an opt-in should usually be in status `pending-confirm` awaiting a call to `confirm-optin`.",
+          "nickname": "validateOptin",
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "description": "",
+              "paramType": "header",
+              "required": true,
+              "allowMultiple": false,
+              "defaultValue": "",
+              "enum": [
+                "application/xml"
+              ],
+              "uniqueItems": false,
+              "type": "string"
+            },
+            {
+              "name": "body",
+              "description": "",
+              "paramType": "body",
+              "required": true,
+              "allowMultiple": false,
+              "defaultValue": "",
+              "uniqueItems": false,
+              "type": "ValidateOptinRequest"
+            }
+          ],
+          "produces": [
+            "application/xml"
+          ],
+          "consumes": [
+            "application/xml"
+          ],
+          "responseMessages": [],
+          "uniqueItems": false,
+          "$ref": "ValidateOptinResponse"
+        }
+      ]
+    },
+    {
+      "path": "/optin/3.0/confirm-optin",
+      "operations": [
+        {
+          "method": "POST",
+          "summary": "Assuming an opt-in is in state `pending-confirm` (i.e. all necessary information about the end-user has already been collected), this call confirms that the opt-in should be activated for billing (after a successful call, optin-status should be `active`).",
+          "nickname": "confirmOptin",
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "description": "",
+              "paramType": "header",
+              "required": true,
+              "allowMultiple": false,
+              "defaultValue": "",
+              "enum": [
+                "application/xml"
+              ],
+              "uniqueItems": false,
+              "type": "string"
+            },
+            {
+              "name": "body",
+              "description": "",
+              "paramType": "body",
+              "required": true,
+              "allowMultiple": false,
+              "defaultValue": "",
+              "uniqueItems": false,
+              "type": "ConfirmOptinRequest"
+            }
+          ],
+          "produces": [
+            "application/xml"
+          ],
+          "consumes": [
+            "application/xml"
+          ],
+          "responseMessages": [],
+          "uniqueItems": false,
+          "$ref": "ConfirmOptinResponse"
+        }
+      ]
+    },
+    {
+      "path": "/optin/3.0/cancel-optin",
+      "operations": [
+        {
+          "method": "POST",
+          "summary": "The purpose of the ‘cancel-optin’ API is for deactivating the consumer’s opt-in stored by Boku and the issuer.\n\nA merchant can use this method in the following possible scenarios:\n\n* User contacts the merchant requesting to remove their payment method\n* Merchant determines that the consumer’s billing account has encountered a permanent error   that should not be retried in the future\n\nA cancel-optin request **must** be sent when a user removes the payment method from the merchant account. Various payment methods enforce a 1:1 mapping, that is, a single payment method account can only be associated to a single merchant account. In the case that the merchant does not call cancel-optin, a user would be unable to associate their payment method account with any other merchant account, even though the user has already requested to remove the payment method from the merchant account.\n\nThe 'optin-id' received from the 'optin' request at the time the consumer added their payment method must be supplied in the 'cancel-optin' request.",
+          "nickname": "cancelOptin",
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "description": "",
+              "paramType": "header",
+              "required": true,
+              "allowMultiple": false,
+              "defaultValue": "",
+              "enum": [
+                "application/xml"
+              ],
+              "uniqueItems": false,
+              "type": "string"
+            },
+            {
+              "name": "body",
+              "description": "",
+              "paramType": "body",
+              "required": true,
+              "allowMultiple": false,
+              "defaultValue": "",
+              "uniqueItems": false,
+              "type": "CancelOptinRequest"
+            }
+          ],
+          "produces": [
+            "application/xml"
+          ],
+          "consumes": [
+            "application/xml"
+          ],
+          "responseMessages": [],
+          "uniqueItems": false,
+          "$ref": "CancelOptinResponse"
+        }
+      ]
+    }
+  ],
+  "models": {
+    "CancelOptinRequest": {
+      "id": "CancelOptinRequest",
+      "description": "'cancel-optin' Request - General Parameters",
+      "required": [
+        "merchantId",
+        "merchantRequestId",
+        "optinId"
+      ],
+      "properties": {
+        "merchantId": {
+          "description": "Boku assigned merchant ID",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "merchantRequestId": {
+          "description": "Merchant assigned unique request ID.\n\nMultiple requests received with the same request ID in this field will be handled idempotently within the idempotency window.",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "optinId": {
+          "description": "Boku provided opt-in ID for the consumer",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        }
+      }
+    },
+    "CancelOptinResponse": {
+      "id": "CancelOptinResponse",
+      "description": "'cancel-optin' Response - General Elements",
+      "required": [
+        "result",
+        "merchantId",
+        "merchantRequestId",
+        "optinId"
+      ],
+      "properties": {
+        "result": {
+          "description": "The 'result' element is defined in every response type. It is used to convey the outcome of an API request.",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "$ref": "Result"
+        },
+        "merchantId": {
+          "description": "Boku assigned merchant ID",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "merchantRequestId": {
+          "description": "Merchant assigned request ID",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "optinId": {
+          "description": "Boku assigned consumer opt-in ID",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "optinType": {
+          "description": "Which method to use to perform opt-in.",
+          "defaultValue": "",
+          "enum": [
+            "hosted"
+          ],
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "optinState": {
+          "description": "Gives the state of the opt-in at the time this response was returned",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "$ref": "OptinState"
+        }
+      }
+    },
+    "ConfirmOptinRequest": {
+      "id": "ConfirmOptinRequest",
+      "description": "'confirm-optin' Request - General Parameters",
+      "required": [
+        "merchantId",
+        "merchantRequestId"
+      ],
+      "properties": {
+        "merchantId": {
+          "description": "Boku assigned merchant ID",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "merchantRequestId": {
+          "description": "Merchant assigned unique request ID.\n\nMultiple requests received with the same request ID in this field will be handled idempotently within the idempotency window.",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "optinId": {
+          "description": "Unique ID generated by Boku for the opt-in",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "optinRequestId": {
+          "description": "The merchant assigned ID used as `merchant-request-id` in the original opt-in call",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        }
+      }
+    },
+    "ConfirmOptinResponse": {
+      "id": "ConfirmOptinResponse",
+      "description": "'confirm-optin' Response - General Elements",
+      "required": [
+        "result",
+        "merchantId",
+        "merchantRequestId",
+        "optinType"
+      ],
+      "properties": {
+        "result": {
+          "description": "The 'result' element is defined in every response type. It is used to convey the outcome of an API request.",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "$ref": "Result"
+        },
+        "timestamp": {
+          "description": "Time request was received (\"YYYY-MM-DD hh:mm:ss\")\n\nAll timestamps are in UTC",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "merchantId": {
+          "description": "Boku assigned merchant ID",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "merchantRequestId": {
+          "description": "Merchant assigned unique request id",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "optinRequestId": {
+          "description": "The merchant assigned ID used as `merchant-request-id` in the original opt-in call",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "optinId": {
+          "description": "Boku assigned opt-in id",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "optinState": {
+          "description": "Gives the state of the opt-in at the time this response was returned",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "$ref": "OptinState"
+        },
+        "paymentMethod": {
+          "description": "The payment method selected",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "optinType": {
+          "description": "Which method to use to perform opt-in.",
+          "defaultValue": "hosted",
+          "uniqueItems": false,
+          "type": "string"
+        }
+      }
+    },
+    "InvalidRequestField": {
+      "id": "InvalidRequestField",
+      "description": "Provides per-field error information in the case where the submitted request did not satisfy validation constraints.",
+      "required": [],
+      "properties": {
+        "path": {
+          "description": "Property path of the field that was in error. The element or attribute name is given in camel-case, with nested objects delimited by `.` (period)\n\nIf there are multiple distinct errors regarding a particular field, it may appear more than once. I.e. `field[path]` is not necessarily unique.",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "reason": {
+          "description": "A descriptive reason why the field was invalid. This message is not localized and so is not appropriate for user messaging.",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        }
+      }
+    },
+    "OptinRequest": {
+      "id": "OptinRequest",
+      "description": "'optin' Request - General Parameters",
+      "required": [
+        "country",
+        "merchantId",
+        "merchantRequestId",
+        "paymentMethod",
+        "optinType",
+        "hosted"
+      ],
+      "properties": {
+        "country": {
+          "description": "Country code in ISO 3166-1-alpha-2 standard",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "merchantId": {
+          "description": "Boku assigned merchant ID",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "merchantRequestId": {
+          "description": "Merchant assigned unique request ID.\n\nMultiple requests received with the same request ID in this field will be handled idempotently within the idempotency window.",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "merchantConsumerId": {
+          "description": "Consumer id assigned by merchant",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "paymentMethod": {
+          "description": "The payment method the consumer has selected:\n\n* Each wallet provider will be its own payment method. A list of available values will be provided on demand.",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "optinType": {
+          "description": "Which method to use to perform opt-in.",
+          "defaultValue": "hosted",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "hosted": {
+          "description": "Container element for parameters relevant when optin-type is 'hosted'",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "$ref": "OptinRequestHosted"
+        },
+        "sellerOfRecord": {
+          "description": "Optin and Charge Request API can be made for specific Seller of Record previously registered with Boku.",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "$ref": "SellerOfRecord"
+        },
+        "notificationUrl": {
+          "description": "",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        }
+      }
+    },
+    "OptinRequestHosted": {
+      "id": "OptinRequestHosted",
+      "description": "Container element for parameters relevant when optin-type is 'hosted'",
+      "required": [
+        "forwardUrl"
+      ],
+      "properties": {
+        "forwardUrl": {
+          "description": "Supplies the URL for Boku to redirect the consumer back to the merchant UI to complete authentication.",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "useMobileFlow": {
+          "description": "True if a mobile-optimized optin flow should be used for this request, false otherwise.\n\nExample: A non-mobile-optimized flow could display a QR code on the user's mobile. The user would be unable to scan the QR code because they are already on their mobile.\n\nA mobile-optimized flow could display a mobile login page to the user.",
+          "defaultValue": "false",
+          "uniqueItems": false,
+          "type": "boolean"
+        },
+        "qrInfo": {
+          "description": "",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "$ref": "OptinRequestQrInfo"
+        }
+      }
+    },
+    "OptinRequestQrInfo": {
+      "id": "OptinRequestQrInfo",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "description": "",
+          "defaultValue": "",
+          "enum": [
+            "QR_CONTENT",
+            "QR_IMAGE_LINK"
+          ],
+          "uniqueItems": false,
+          "type": "string"
+        }
+      }
+    },
+    "OptinResponse": {
+      "id": "OptinResponse",
+      "description": "'optin' Response - General Parameters",
+      "required": [
+        "result",
+        "merchantRequestId",
+        "merchantId"
+      ],
+      "properties": {
+        "result": {
+          "description": "The 'result' element is defined in every response type. It is used to convey the outcome of an API request.",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "$ref": "Result"
+        },
+        "timestamp": {
+          "description": "Time request was received (\"YYYY-MM-DD hh:mm:ss\").\n\nAll timestamps are in UTC.",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "merchantRequestId": {
+          "description": "Merchant assigned unique request ID",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "merchantId": {
+          "description": "Boku assigned merchant ID",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "optinId": {
+          "description": "Unique ID generated by Boku for the opt-in",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "optinState": {
+          "description": "Gives the state of the opt-in at the time this response was returned",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "$ref": "OptinState"
+        },
+        "paymentMethod": {
+          "description": "The payment method selected",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "optinType": {
+          "description": "Which method to use to perform opt-in.",
+          "defaultValue": "",
+          "enum": [
+            "hosted"
+          ],
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "hosted": {
+          "description": "Provides information for proceeding with a hosted opt-in",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "$ref": "OptinResponseHosted"
+        },
+        "sellerOfRecord": {
+          "description": "Optin and Charge Request API can be made for specific Seller of Record previously registered with Boku.",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "$ref": "SellerOfRecord"
+        }
+      }
+    },
+    "OptinResponseHosted": {
+      "id": "OptinResponseHosted",
+      "description": "Provides information for proceeding with a hosted opt-in",
+      "required": [
+        "optinUrl"
+      ],
+      "properties": {
+        "optinUrl": {
+          "description": "Boku provided URL that provides the opt-in UI for the consumer.",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "qrInfo": {
+          "description": "",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "$ref": "OptinResponseQrInfo"
+        }
+      }
+    },
+    "OptinResponseQrInfo": {
+      "id": "OptinResponseQrInfo",
+      "required": [
+        "type",
+        "source"
+      ],
+      "properties": {
+        "type": {
+          "description": "",
+          "defaultValue": "",
+          "enum": [
+            "QR_CONTENT",
+            "QR_IMAGE_LINK"
+          ],
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "source": {
+          "description": "",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        }
+      }
+    },
+    "OptinState": {
+      "id": "OptinState",
+      "description": "Gives the state of the opt-in at the time this response was returned",
+      "required": [
+        "optinStatus",
+        "country"
+      ],
+      "properties": {
+        "optinStatus": {
+          "description": "Gives the status of the opt-in at the time this response was returned",
+          "defaultValue": "",
+          "enum": [
+            "pending-validate",
+            "pending-confirm",
+            "active",
+            "closed"
+          ],
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "networkId": {
+          "description": "The internal network ID of the user, as declared in `network-info` -> `network[id]`",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "country": {
+          "description": "Country code in ISO 3166-1-alpha-2 standard",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "accountIdentifier": {
+          "description": "Free-text consumer account identifier provided by the payment provider. This value will be recognizable to the user and might not be unique.",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "issuerUniqueUserId": {
+          "description": "Unique user id provided by the payment provider. This value could be an id that is not recognizable to the user.",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        }
+      }
+    },
+    "Result": {
+      "id": "Result",
+      "description": "The 'result' element is defined in every response type. It is used to convey the outcome of an API request.",
+      "required": [
+        "status",
+        "reasonCode",
+        "message",
+        "retriable"
+      ],
+      "properties": {
+        "status": {
+          "description": "The status of the operation",
+          "defaultValue": "",
+          "enum": [
+            "OK",
+            "ERROR"
+          ],
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "reasonCode": {
+          "description": "Provides additional information for the status",
+          "defaultValue": "",
+          "minimum": "",
+          "maximum": "",
+          "uniqueItems": false,
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "description": "Description of the reason code",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "retriable": {
+          "description": "**true** if the request can be retried; **false** otherwise",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "boolean"
+        },
+        "retryDelay": {
+          "description": "Minimum milliseconds to delay before re-trying request",
+          "defaultValue": "",
+          "minimum": "",
+          "maximum": "",
+          "uniqueItems": false,
+          "type": "integer",
+          "format": "int32"
+        },
+        "invalidRequestFields": {
+          "description": "",
+          "items": {
+            "$ref": "InvalidRequestField"
+          },
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "array"
+        }
+      }
+    },
+    "SellerOfRecord": {
+      "id": "SellerOfRecord",
+      "description": "Optin and Charge Request API can be made for specific Seller of Record previously registered with Boku.",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "description": "ID of seller of record previously registered with Boku. Boku generated Seller of Record id will be 24 character alpha-numeric string.",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        }
+      }
+    },
+    "Timeout": {
+      "id": "Timeout",
+      "description": "Specifies how long to block waiting for a response",
+      "required": [
+        "after"
+      ],
+      "properties": {
+        "after": {
+          "description": "Maximum time to block before returning a response, in milliseconds. The value `0` means do not block, and there is no way to specify infinity.",
+          "defaultValue": "",
+          "minimum": "0",
+          "maximum": "60000",
+          "uniqueItems": false,
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "ValidateOptinRequest": {
+      "id": "ValidateOptinRequest",
+      "description": "'validate-optin' Request - General Parameters",
+      "required": [
+        "merchantId",
+        "merchantRequestId",
+        "optinType"
+      ],
+      "properties": {
+        "merchantId": {
+          "description": "Boku assigned merchant ID",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "merchantRequestId": {
+          "description": "Merchant assigned unique request ID.\n\nMultiple requests received with the same request ID in this field will be handled idempotently within the idempotency window.",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "optinId": {
+          "description": "Unique ID generated by Boku for the opt-in",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "optinRequestId": {
+          "description": "The merchant assigned ID used as `merchant-request-id` in the original opt-in call",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "optinType": {
+          "description": "Which method to use to perform opt-in.",
+          "defaultValue": "hosted",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "timeout": {
+          "description": "Specifies how long to block waiting for a response",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "$ref": "Timeout"
+        }
+      }
+    },
+    "ValidateOptinResponse": {
+      "id": "ValidateOptinResponse",
+      "description": "'validate-optin' Response - General Elements",
+      "required": [
+        "result",
+        "merchantId",
+        "merchantRequestId"
+      ],
+      "properties": {
+        "result": {
+          "description": "The 'result' element is defined in every response type. It is used to convey the outcome of an API request.",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "$ref": "Result"
+        },
+        "merchantId": {
+          "description": "Boku assigned merchant ID",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "merchantRequestId": {
+          "description": "Merchant assigned unique request id",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "optinRequestId": {
+          "description": "The merchant assigned ID used as `merchant-request-id` in the original opt-in call",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "optinId": {
+          "description": "Boku assigned opt-in id",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "optinState": {
+          "description": "Gives the state of the opt-in at the time this response was returned",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "$ref": "OptinState"
+        },
+        "paymentMethod": {
+          "description": "The payment method selected",
+          "defaultValue": "",
+          "uniqueItems": false,
+          "type": "string"
+        },
+        "optinType": {
+          "description": "Which method to use to perform opt-in.",
+          "defaultValue": "",
+          "enum": [
+            "hosted"
+          ],
+          "uniqueItems": false,
+          "type": "string"
+        }
+      }
+    }
+  },
+  "authorizations": {},
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ]
+}

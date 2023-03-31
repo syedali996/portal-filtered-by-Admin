@@ -1,0 +1,562 @@
+FORMAT: 1A
+HOST: https://jp-api4-stage.boku.com
+
+# Boku Direct Payments API
+## API Security
+
+Security is a significant consideration for payment platforms. As part of the registration process for each registered merchant account, merchants receive a security key used to authenticate communications in either direction.
+
+Developers should consult the [Boku API Signature Authentication Guide](page:guides/api-signature-authentication-guide) for additional details with respect to implementing security on the Boku APIs.
+
+## API Usage
+
+When a consumer chooses to use a local payment-method (wallet), the consumer must go through an 'optin' flow to authenticate. This is accomplished using a redirect to the issuer's app or website where the consumer authenticates and completes the opt-in process.
+
+After the consumer adds their local payment-method (wallet), as their registered payment method, the 'charge' method is used to charge the consumer's local payment-method.
+
+If a customer decides to refund a transaction, the 'refund-charge' method can be used to refund the transaction.
+
+## API Versioning
+
+The Boku Payment Gateway API is versioned to provide support for changes to functionality without affecting existing integrations.  Each API URL includes version information that enables distinct functionality across different versions.
+
+There are several types of changes that could result in a new API version:
+
+1. New API functionality – new APIs, new parameters, additional information in responses, improved error reporting.
+2. Deprecated API functionality – deprecated APIs, deprecated parameters, deprecated error messages.
+3. Changes in functionality – existing functional behavior changes such as the returned result of a call. A warning is changed to an error.  Validation becomes stricter or more lenient.
+
+In these cases, Boku will release a new API version through a new endpoint(s). When new versions of existing APIs are added, support for existing versions is maintained.  Unless otherwise stated, as a rule, compatibility is maintained across versions.  Prior supported endpoints should have unchanged behavior. If an API is deprecated and scheduled to be removed, a notice of not less than 6 months will be given.  Requests for extensions to this period can be considered.
+
+Boku may make changes to the API within an existing version without changing the version number. An example of a non-versioning change would be the addition of an optional field to a request or to a response.
+
+## API Calls
+
+### URL Scheme
+
+All the below API calls are against URLs that follow the pattern,
+
+``
+https://${api-node}.boku.com/${api-family}/${api-version}/${api-call}
+``
+
+Definitions for the above placeholders:
+
+* **api-node**: This follows the pattern '${country}-api4' (e.g. 'us-api4').
+    * 'country' is the two letter country code of the end-user's payment-method against which the call is made.
+    * The country code is required and is used for more efficient routing of the request.
+    * The country code in the url must match the country code supplied in the `optin-request`.`country` element.
+* **api-family**: Groups a family of related API methods.
+    * In this API, family is either one of:
+        * 'optin' - For interacting with the user or handset to obtain billing approval.
+        * 'billing' - For actually performing billing operations against the user.
+* **api-version**: In this version of the API, this value is always the string '3.0'.
+    * Calls under different version numbers may be used in the future to introduce non-compatible API changes.
+* **api-call**: The name particular API call or method to invoke, for example 'charge' or 'refund-charge'.
+    * This usually matches the XML root element name, sans the '-request' suffix.
+
+Fully qualified API call URLs are documented with each of the example calls detailed below.
+
+# Group Consumer Registration
+
+These methods are used to obtain consumer approval to register a local payment-method as a payment method. A successful 'optin' sequence results in a registered local payment method with a merchant.
+
+#### Opt-in Hosted
+
+| Step | Description | API |
+|------|-------------|-----|
+| 1 | Consumer comes into merchant from a country that has a local payment method(wallet) as a payment option. | |
+| 2 | Merchant collects payment-method (wallet) from consumer | |
+| 3 | Merchant sends the request to Boku to collect an approval (opt-in) from the consumer for payments | 'optin' API method |
+| 4 | Boku returns an optin URL to the merchant, to which a consumer must be redirected | |
+| 5 | Consumer completes the optin process on the issuer's app or website | |
+| 6 | Merchant polls Boku to retrieve the identity of the consumer | 'validate-optin' API method |
+| 7 | Merchant sends the confirmation to Boku to complete consumer authentication | 'confirm-optin' API method |
+| 8 | Boku responds with authentication success or failure. | |
+
+#### Cancel Opt-in
+
+| Step | Description | API |
+|------|-------------|-----|
+| 1 | Merchant sends the request to Boku to cancel a previously collected opt-in. Remove a payment method. | 'cancel-optin' API method |
+| 2 | Boku responds with success or failure | |
+
+#### Hosted opt-in consumer redirection
+
+When using an optin-type of hosted, the consumer must be redirected to the optin-url provided in the 'optin' response. The UI presented to the consumer will guide them through the authentication process.
+
+Upon completing authentication, the consumer will be redirected to the forward-url provided in the 'optin' request. A follow-up `validate-optin` call must be made in order to verify that the authentication succeeded.
+
+
+## Optin 30 Optin [/optin/3.0/optin]
+
+### optin [POST]
+The 'optin' call initiates the consumer authentication process. After an `optin` call, an opt-in is usually in status `pending-validate`.
+
+The optin call types are
+
+* 'hosted' - redirect the consumer to an issuer-provided UI to perform verification.
+
+The 'optin' call is used in conjunction with the following related methods in order to complete consumer approval:
+
+* 'validate-optin' - identify and validate the billing account the consumer is registering as   their payment method.
+* 'confirm-optin' - confirm that the associated 'optin' should be activated for billing.
+
+It is possible to restrict an optin to be used for a single charge by specifying the 'terms' element. When provided, the system will only allow a single 'charge' request to be made for this optin.
+
++ Request (<<Add Header Value>>)
+
+    + Attributes (OptinRequest)
+
+
+    + Body
+
+            <optin-request>
+              <country>JP</country>
+              <merchant-id>gatewaymerchant</merchant-id>
+              <merchant-request-id>2032405</merchant-request-id>
+              <payment-method>superwallet</payment-method>
+              <optin-type>hosted</optin-type>
+              <hosted>
+                <forward-url>https://merchant.com/redirect/2032405</forward-url>
+              </hosted>
+              <seller-of-record>
+                <id>73tdolramou0m6jnqyb6pkk3</id>
+              </seller-of-record>
+            </optin-request>
+
+
++ Response 200 (application/xml)
+    + Attributes (OptinResponse)
+
+
+    + Body
+
+            <optin-response>
+              <result>
+                <reason-code>0</reason-code>
+                <message>Operation Successful</message>
+                <retriable>false</retriable>
+                <status>OK</status>
+              </result>
+              <timestamp>2015-02-40 04:44:16</timestamp>
+              <merchant-id>gatewaymerchant</merchant-id>
+              <merchant-request-id>2032405</merchant-request-id>
+              <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>
+              <optin-state>
+                <optin-status>pending-validate</optin-status>
+                <country>JP</country>
+                <network-id>jp-super</network-id>
+                <account-identifier>te****st@boku.com</account-identifier>
+                <issuer-unique-user-id>cc1c4f3</issuer-unique-user-id>
+              </optin-state>
+              <optin-type>hosted</optin-type>
+              <hosted>
+                <optin-url>https://www.issuer.com/optin/2032405</optin-url>
+              </hosted>
+              <payment-method>superwallet</payment-method>
+            </optin-response>
+
+
+
+## Optin 30 Validate Optin [/optin/3.0/validate-optin]
+
+### validateOptin [POST]
+The main purpose of an opt-in is to identify and verify the payment method that the end-user wants to register. In the process, the user confirms that they have control over the corresponding payment method. Once an opt-in has begun via an `optin` API call, the `validate-optin` call is used to complete this verification and in most cases retrieve the end-user details such as the account identifier of the user.
+
+Specifically
+
+* **hosted**: Confirm successful authentication via opt-in UI, and retrieve the account   identifier of the user.
+
+After a successful `validate-optin` call, an opt-in should usually be in status `pending-confirm` awaiting a call to `confirm-optin`.
+
++ Request (<<Add Header Value>>)
+
+    + Attributes (ValidateOptinRequest)
+
+
+    + Body
+
+            <validate-optin-request>
+              <merchant-id>gatewaymerchant</merchant-id>
+              <merchant-request-id>2032405</merchant-request-id>
+              <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>
+              <optin-type>hosted</optin-type>
+            </validate-optin-request>
+
+
++ Response 200 (application/xml)
+    + Attributes (ValidateOptinResponse)
+
+
+    + Body
+
+            <validate-optin-response>
+              <result>
+                <reason-code>0</reason-code>
+                <message>Operation Successful</message>
+                <retriable>false</retriable>
+                <status>OK</status>
+              </result>
+              <merchant-id>gatewaymerchant</merchant-id>
+              <merchant-request-id>2032405</merchant-request-id>
+              <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>
+              <optin-state>
+                <optin-status>pending-confirm</optin-status>
+                <country>JP</country>
+                <network-id>jp-super</network-id>
+                <account-identifier>te****st@boku.com</account-identifier>
+                <issuer-unique-user-id>cc1c4f3</issuer-unique-user-id>
+              </optin-state>
+              <optin-type>hosted</optin-type>
+              <payment-method>superwallet</payment-method>
+            </validate-optin-response>
+
+
+
+## Optin 30 Confirm Optin [/optin/3.0/confirm-optin]
+
+### confirmOptin [POST]
+Assuming an opt-in is in state `pending-confirm` (i.e. all necessary information about the end-user has already been collected), this call confirms that the opt-in should be activated for billing (after a successful call, optin-status should be `active`).
+
++ Request (<<Add Header Value>>)
+
+    + Attributes (ConfirmOptinRequest)
+
+
+    + Body
+
+            <confirm-optin-request>
+              <merchant-id>gatewaymerchant</merchant-id>
+              <merchant-request-id>1002004</merchant-request-id>
+              <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>
+            </confirm-optin-request>
+
+
++ Response 200 (application/xml)
+    + Attributes (ConfirmOptinResponse)
+
+
+    + Body
+
+            <confirm-optin-response>
+              <result>
+                <reason-code>0</reason-code>
+                <message>Operation Successful</message>
+                <retriable>false</retriable>
+                <status>OK</status>
+              </result>
+              <timestamp>2015-02-40 04:44:16</timestamp>
+              <merchant-id>gatewaymerchant</merchant-id>
+              <merchant-request-id>1002004</merchant-request-id>
+              <optin-request-id>1002001</optin-request-id>
+              <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>
+              <optin-state>
+                <optin-status>active</optin-status>
+                <country>JP</country>
+                <network-id>jp-super</network-id>
+                <account-identifier>te****st@boku.com</account-identifier>
+                <issuer-unique-user-id>cc1c4f3</issuer-unique-user-id>
+              </optin-state>
+              <optin-type>hosted</optin-type>
+              <payment-method>superwallet</payment-method>
+            </confirm-optin-response>
+
+
+
+## Optin 30 Cancel Optin [/optin/3.0/cancel-optin]
+
+### cancelOptin [POST]
+The purpose of the ‘cancel-optin’ API is for deactivating the consumer’s opt-in stored by Boku and the issuer.
+
+A merchant can use this method in the following possible scenarios:
+
+* User contacts the merchant requesting to remove their payment method
+* Merchant determines that the consumer’s billing account has encountered a permanent error   that should not be retried in the future
+
+A cancel-optin request **must** be sent when a user removes the payment method from the merchant account. Various payment methods enforce a 1:1 mapping, that is, a single payment method account can only be associated to a single merchant account. In the case that the merchant does not call cancel-optin, a user would be unable to associate their payment method account with any other merchant account, even though the user has already requested to remove the payment method from the merchant account.
+
+The 'optin-id' received from the 'optin' request at the time the consumer added their payment method must be supplied in the 'cancel-optin' request.
+
++ Request (<<Add Header Value>>)
+
+    + Attributes (CancelOptinRequest)
+
+
+    + Body
+
+            <cancel-optin-request>
+              <merchant-id>gatewaymerchant</merchant-id>
+              <merchant-request-id>1002006</merchant-request-id>
+              <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>
+            </cancel-optin-request>
+
+
++ Response 200 (application/xml)
+    + Attributes (CancelOptinResponse)
+
+
+    + Body
+
+            <cancel-optin-response>
+              <result>
+                <reason-code>0</reason-code>
+                <message>Operation Successful</message>
+                <retriable>false</retriable>
+                <status>OK</status>
+              </result>
+              <merchant-id>gatewaymerchant</merchant-id>
+              <merchant-request-id>1002006</merchant-request-id>
+              <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>
+              <optin-state>
+                <optin-status>closed</optin-status>
+                <country>DE</country>
+                <network-id>de-super</network-id>
+              </optin-state>
+              <optin-type>hosted</optin-type>
+            </cancel-optin-response>
+
+
+
+
+# Data Structures
+
+## CancelOptinRequest (object)
+'cancel-optin' Request - General Parameters
+
+### Properties
++ `merchantId` (string, required) - Boku assigned merchant ID
++ `merchantRequestId` (string, required)
+
+    Merchant assigned unique request ID.
+    
+    Multiple requests received with the same request ID in this field will be handled idempotently within the idempotency window.
+
++ `optinId` (string, required) - Boku provided opt-in ID for the consumer
+
+
+## CancelOptinResponse (object)
+'cancel-optin' Response - General Elements
+
+### Properties
++ `result` (Result, required) - The 'result' element is defined in every response type. It is used to convey the outcome of an API request.
++ `merchantId` (string, required) - Boku assigned merchant ID
++ `merchantRequestId` (string, required) - Merchant assigned request ID
++ `optinId` (string, required) - Boku assigned consumer opt-in ID
++ `optinType` (enum[string], optional) - Which method to use to perform opt-in.
+    + `hosted`
++ `optinState` (OptinState, optional) - Gives the state of the opt-in at the time this response was returned
+
+
+## ConfirmOptinRequest (object)
+'confirm-optin' Request - General Parameters
+
+### Properties
++ `merchantId` (string, required) - Boku assigned merchant ID
++ `merchantRequestId` (string, required)
+
+    Merchant assigned unique request ID.
+    
+    Multiple requests received with the same request ID in this field will be handled idempotently within the idempotency window.
+
++ `optinId` (string, optional) - Unique ID generated by Boku for the opt-in
++ `optinRequestId` (string, optional) - The merchant assigned ID used as `merchant-request-id` in the original opt-in call
+
+
+## ConfirmOptinResponse (object)
+'confirm-optin' Response - General Elements
+
+### Properties
++ `result` (Result, required) - The 'result' element is defined in every response type. It is used to convey the outcome of an API request.
++ `timestamp` (string, optional)
+
+    Time request was received ("YYYY-MM-DD hh:mm:ss")
+    
+    All timestamps are in UTC
+
++ `merchantId` (string, required) - Boku assigned merchant ID
++ `merchantRequestId` (string, required) - Merchant assigned unique request id
++ `optinRequestId` (string, optional) - The merchant assigned ID used as `merchant-request-id` in the original opt-in call
++ `optinId` (string, optional) - Boku assigned opt-in id
++ `optinState` (OptinState, optional) - Gives the state of the opt-in at the time this response was returned
++ `paymentMethod` (string, optional) - The payment method selected
++ `optinType`: `hosted` (string, required) - Which method to use to perform opt-in.
+
+
+## InvalidRequestField (object)
+Provides per-field error information in the case where the submitted request did not satisfy validation constraints.
+
+### Properties
++ `path` (string, optional)
+
+    Property path of the field that was in error. The element or attribute name is given in camel-case, with nested objects delimited by `.` (period)
+    
+    If there are multiple distinct errors regarding a particular field, it may appear more than once. I.e. `field[path]` is not necessarily unique.
+
++ `reason` (string, optional) - A descriptive reason why the field was invalid. This message is not localized and so is not appropriate for user messaging.
+
+
+## OptinRequest (object)
+'optin' Request - General Parameters
+
+### Properties
++ `country` (string, required) - Country code in ISO 3166-1-alpha-2 standard
++ `merchantId` (string, required) - Boku assigned merchant ID
++ `merchantRequestId` (string, required)
+
+    Merchant assigned unique request ID.
+    
+    Multiple requests received with the same request ID in this field will be handled idempotently within the idempotency window.
+
++ `merchantConsumerId` (string, optional) - Consumer id assigned by merchant
++ `paymentMethod` (string, required)
+
+    The payment method the consumer has selected:
+    
+    * Each wallet provider will be its own payment method. A list of available values will be provided on demand.
+
++ `optinType`: `hosted` (string, required) - Which method to use to perform opt-in.
++ `hosted` (OptinRequestHosted, required) - Container element for parameters relevant when optin-type is 'hosted'
++ `sellerOfRecord` (SellerOfRecord, optional) - Optin and Charge Request API can be made for specific Seller of Record previously registered with Boku.
++ `notificationUrl` (string, optional) 
+
+
+## OptinRequestHosted (object)
+Container element for parameters relevant when optin-type is 'hosted'
+
+### Properties
++ `forwardUrl` (string, required) - Supplies the URL for Boku to redirect the consumer back to the merchant UI to complete authentication.
++ `useMobileFlow`: `false` (boolean, optional)
+
+    True if a mobile-optimized optin flow should be used for this request, false otherwise.
+    
+    Example: A non-mobile-optimized flow could display a QR code on the user's mobile. The user would be unable to scan the QR code because they are already on their mobile.
+    
+    A mobile-optimized flow could display a mobile login page to the user.
+
++ `qrInfo` (OptinRequestQrInfo, optional) 
+
+
+## OptinRequestQrInfo (object)
+
+
+### Properties
++ `type` (enum[string], required) 
+    + `QR_CONTENT`
+    + `QR_IMAGE_LINK`
+
+
+## OptinResponse (object)
+'optin' Response - General Parameters
+
+### Properties
++ `result` (Result, required) - The 'result' element is defined in every response type. It is used to convey the outcome of an API request.
++ `timestamp` (string, optional)
+
+    Time request was received ("YYYY-MM-DD hh:mm:ss").
+    
+    All timestamps are in UTC.
+
++ `merchantRequestId` (string, required) - Merchant assigned unique request ID
++ `merchantId` (string, required) - Boku assigned merchant ID
++ `optinId` (string, optional) - Unique ID generated by Boku for the opt-in
++ `optinState` (OptinState, optional) - Gives the state of the opt-in at the time this response was returned
++ `paymentMethod` (string, optional) - The payment method selected
++ `optinType` (enum[string], optional) - Which method to use to perform opt-in.
+    + `hosted`
++ `hosted` (OptinResponseHosted, optional) - Provides information for proceeding with a hosted opt-in
++ `sellerOfRecord` (SellerOfRecord, optional) - Optin and Charge Request API can be made for specific Seller of Record previously registered with Boku.
+
+
+## OptinResponseHosted (object)
+Provides information for proceeding with a hosted opt-in
+
+### Properties
++ `optinUrl` (string, required) - Boku provided URL that provides the opt-in UI for the consumer.
++ `qrInfo` (OptinResponseQrInfo, optional) 
+
+
+## OptinResponseQrInfo (object)
+
+
+### Properties
++ `type` (enum[string], required) 
+    + `QR_CONTENT`
+    + `QR_IMAGE_LINK`
++ `source` (string, required) 
+
+
+## OptinState (object)
+Gives the state of the opt-in at the time this response was returned
+
+### Properties
++ `optinStatus` (enum[string], required) - Gives the status of the opt-in at the time this response was returned
+    + `pending-validate`
+    + `pending-confirm`
+    + `active`
+    + `closed`
++ `networkId` (string, optional) - The internal network ID of the user, as declared in `network-info` -> `network[id]`
++ `country` (string, required) - Country code in ISO 3166-1-alpha-2 standard
++ `accountIdentifier` (string, optional) - Free-text consumer account identifier provided by the payment provider. This value will be recognizable to the user and might not be unique.
++ `issuerUniqueUserId` (string, optional) - Unique user id provided by the payment provider. This value could be an id that is not recognizable to the user.
+
+
+## Result (object)
+The 'result' element is defined in every response type. It is used to convey the outcome of an API request.
+
+### Properties
++ `status` (enum[string], required) - The status of the operation
+    + `OK`
+    + `ERROR`
++ `reasonCode` (number, required) - Provides additional information for the status
++ `message` (string, required) - Description of the reason code
++ `retriable` (boolean, required) - **true** if the request can be retried; **false** otherwise
++ `retryDelay` (number, optional) - Minimum milliseconds to delay before re-trying request
++ `invalidRequestFields` (array[InvalidRequestField], optional) 
+
+
+## SellerOfRecord (object)
+Optin and Charge Request API can be made for specific Seller of Record previously registered with Boku.
+
+### Properties
++ `id` (string, required) - ID of seller of record previously registered with Boku. Boku generated Seller of Record id will be 24 character alpha-numeric string.
+
+
+## Timeout (object)
+Specifies how long to block waiting for a response
+
+### Properties
++ `after` (number, required) - Maximum time to block before returning a response, in milliseconds. The value `0` means do not block, and there is no way to specify infinity.
+
+
+## ValidateOptinRequest (object)
+'validate-optin' Request - General Parameters
+
+### Properties
++ `merchantId` (string, required) - Boku assigned merchant ID
++ `merchantRequestId` (string, required)
+
+    Merchant assigned unique request ID.
+    
+    Multiple requests received with the same request ID in this field will be handled idempotently within the idempotency window.
+
++ `optinId` (string, optional) - Unique ID generated by Boku for the opt-in
++ `optinRequestId` (string, optional) - The merchant assigned ID used as `merchant-request-id` in the original opt-in call
++ `optinType`: `hosted` (string, required) - Which method to use to perform opt-in.
++ `timeout` (Timeout, optional) - Specifies how long to block waiting for a response
+
+
+## ValidateOptinResponse (object)
+'validate-optin' Response - General Elements
+
+### Properties
++ `result` (Result, required) - The 'result' element is defined in every response type. It is used to convey the outcome of an API request.
++ `merchantId` (string, required) - Boku assigned merchant ID
++ `merchantRequestId` (string, required) - Merchant assigned unique request id
++ `optinRequestId` (string, optional) - The merchant assigned ID used as `merchant-request-id` in the original opt-in call
++ `optinId` (string, optional) - Boku assigned opt-in id
++ `optinState` (OptinState, optional) - Gives the state of the opt-in at the time this response was returned
++ `paymentMethod` (string, optional) - The payment method selected
++ `optinType` (enum[string], optional) - Which method to use to perform opt-in.
+    + `hosted`
+

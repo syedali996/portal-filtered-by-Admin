@@ -1,0 +1,1900 @@
+#%RAML 1.0
+title: Boku Direct Payments API
+version: '3.0'
+baseUri: https://jp-api4-stage.boku.com
+baseUriParameters:
+  country:
+    required: false
+    default: jp
+    displayName: country
+    description: Country code in ISO 3166-1-alpha-2 standard
+    type: string
+protocols:
+- HTTPS
+documentation:
+- title: Boku Direct Payments API
+  content: |
+    ## API Security
+
+
+    Security is a significant consideration for payment platforms. As part of the registration process for each registered merchant account, merchants receive a security key used to authenticate communications in either direction.
+
+
+    Developers should consult the [Boku API Signature Authentication Guide](page:guides/api-signature-authentication-guide) for additional details with respect to implementing security on the Boku APIs.
+
+
+    ## API Usage
+
+
+    When a consumer chooses to use a local payment-method (wallet), the consumer must go through an 'optin' flow to authenticate. This is accomplished using a redirect to the issuer's app or website where the consumer authenticates and completes the opt-in process.
+
+
+    After the consumer adds their local payment-method (wallet), as their registered payment method, the 'charge' method is used to charge the consumer's local payment-method.
+
+
+    If a customer decides to refund a transaction, the 'refund-charge' method can be used to refund the transaction.
+
+
+    ## API Versioning
+
+
+    The Boku Payment Gateway API is versioned to provide support for changes to functionality without affecting existing integrations.  Each API URL includes version information that enables distinct functionality across different versions.
+
+
+    There are several types of changes that could result in a new API version:
+
+
+    1. New API functionality – new APIs, new parameters, additional information in responses, improved error reporting.
+
+    2. Deprecated API functionality – deprecated APIs, deprecated parameters, deprecated error messages.
+
+    3. Changes in functionality – existing functional behavior changes such as the returned result of a call. A warning is changed to an error.  Validation becomes stricter or more lenient.
+
+
+    In these cases, Boku will release a new API version through a new endpoint(s). When new versions of existing APIs are added, support for existing versions is maintained.  Unless otherwise stated, as a rule, compatibility is maintained across versions.  Prior supported endpoints should have unchanged behavior. If an API is deprecated and scheduled to be removed, a notice of not less than 6 months will be given.  Requests for extensions to this period can be considered.
+
+
+    Boku may make changes to the API within an existing version without changing the version number. An example of a non-versioning change would be the addition of an optional field to a request or to a response.
+
+
+    ## API Calls
+
+
+    ### URL Scheme
+
+
+    All the below API calls are against URLs that follow the pattern,
+
+
+    ``
+
+    https://${api-node}.boku.com/${api-family}/${api-version}/${api-call}
+
+    ``
+
+
+    Definitions for the above placeholders:
+
+
+    * **api-node**: This follows the pattern '${country}-api4' (e.g. 'us-api4').
+        * 'country' is the two letter country code of the end-user's payment-method against which the call is made.
+        * The country code is required and is used for more efficient routing of the request.
+        * The country code in the url must match the country code supplied in the `optin-request`.`country` element.
+    * **api-family**: Groups a family of related API methods.
+        * In this API, family is either one of:
+            * 'optin' - For interacting with the user or handset to obtain billing approval.
+            * 'billing' - For actually performing billing operations against the user.
+    * **api-version**: In this version of the API, this value is always the string '3.0'.
+        * Calls under different version numbers may be used in the future to introduce non-compatible API changes.
+    * **api-call**: The name particular API call or method to invoke, for example 'charge' or 'refund-charge'.
+        * This usually matches the XML root element name, sans the '-request' suffix.
+
+    Fully qualified API call URLs are documented with each of the example calls detailed below.
+types:
+  CancelOptinRequest:
+    example:
+      value: |
+        <cancel-optin-request>
+
+          <merchant-id>gatewaymerchant</merchant-id>
+
+          <merchant-request-id>1002006</merchant-request-id>
+
+          <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>
+
+        </cancel-optin-request>
+    displayName: CancelOptinRequest
+    description: "'cancel-optin' Request - General Parameters"
+    xml:
+      name: cancel-optin-request
+    type: object
+    properties:
+      merchantId:
+        required: true
+        displayName: merchantId
+        description: Boku assigned merchant ID
+        xml:
+          attribute: false
+          wrapped: false
+          name: merchant-id
+        type: string
+        minLength: 1
+        maxLength: 50
+      merchantRequestId:
+        required: true
+        displayName: merchantRequestId
+        description: |
+          Merchant assigned unique request ID.
+
+
+          Multiple requests received with the same request ID in this field will be handled idempotently within the idempotency window.
+        xml:
+          attribute: false
+          wrapped: false
+          name: merchant-request-id
+        type: string
+        minLength: 1
+        maxLength: 50
+      optinId:
+        required: true
+        displayName: optinId
+        description: Boku provided opt-in ID for the consumer
+        xml:
+          attribute: false
+          wrapped: false
+          name: optin-id
+        type: string
+        minLength: 1
+        maxLength: 50
+  CancelOptinResponse:
+    example:
+      value: |
+        <cancel-optin-response>
+
+          <result>
+
+            <reason-code>0</reason-code>
+
+            <message>Operation Successful</message>
+
+            <retriable>false</retriable>
+
+            <status>OK</status>
+
+          </result>
+
+          <merchant-id>gatewaymerchant</merchant-id>
+
+          <merchant-request-id>1002006</merchant-request-id>
+
+          <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>
+
+          <optin-state>
+
+            <optin-status>closed</optin-status>
+
+            <country>DE</country>
+
+            <network-id>de-super</network-id>
+
+          </optin-state>
+
+          <optin-type>hosted</optin-type>
+
+        </cancel-optin-response>
+    displayName: CancelOptinResponse
+    description: "'cancel-optin' Response - General Elements"
+    xml:
+      name: cancel-optin-response
+    type: object
+    properties:
+      result:
+        required: true
+        example:
+          value: |
+            <result>
+
+              <reason-code>0</reason-code>
+
+              <message>Operation Successful</message>
+
+              <retriable>false</retriable>
+
+              <status>OK</status>
+
+            </result>
+        displayName: result
+        description: The 'result' element is defined in every response type. It is used to convey the outcome of an API request.
+        xml:
+          attribute: false
+          wrapped: false
+          name: result
+        type: Result
+      merchantId:
+        required: true
+        displayName: merchantId
+        description: Boku assigned merchant ID
+        xml:
+          attribute: false
+          wrapped: false
+          name: merchant-id
+        type: string
+        maxLength: 50
+      merchantRequestId:
+        required: true
+        displayName: merchantRequestId
+        description: Merchant assigned request ID
+        xml:
+          attribute: false
+          wrapped: false
+          name: merchant-request-id
+        type: string
+        maxLength: 50
+      optinId:
+        required: true
+        displayName: optinId
+        description: Boku assigned consumer opt-in ID
+        xml:
+          attribute: false
+          wrapped: false
+          name: optin-id
+        type: string
+        maxLength: 24
+      optinType:
+        required: false
+        displayName: optinType
+        description: Which method to use to perform opt-in.
+        xml:
+          attribute: false
+          wrapped: false
+          name: optin-type
+        type: string
+        enum:
+        - hosted
+      optinState:
+        required: false
+        example:
+          value: |
+            <optin-state>
+
+              <optin-status>pending-validate</optin-status>
+
+              <country>JP</country>
+
+              <network-id>jp-super</network-id>
+
+              <account-identifier>te****st@boku.com</account-identifier>
+
+              <issuer-unique-user-id>cc1c4f3</issuer-unique-user-id>
+
+            </optin-state>
+        displayName: optinState
+        description: Gives the state of the opt-in at the time this response was returned
+        xml:
+          attribute: false
+          wrapped: false
+          name: optin-state
+        type: OptinState
+  ConfirmOptinRequest:
+    example:
+      value: |
+        <confirm-optin-request>
+
+          <merchant-id>gatewaymerchant</merchant-id>
+
+          <merchant-request-id>1002004</merchant-request-id>
+
+          <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>
+
+        </confirm-optin-request>
+    displayName: ConfirmOptinRequest
+    description: "'confirm-optin' Request - General Parameters"
+    xml:
+      name: confirm-optin-request
+    type: object
+    properties:
+      merchantId:
+        required: true
+        displayName: merchantId
+        description: Boku assigned merchant ID
+        xml:
+          attribute: false
+          wrapped: false
+          name: merchant-id
+        type: string
+        minLength: 1
+        maxLength: 50
+      merchantRequestId:
+        required: true
+        displayName: merchantRequestId
+        description: |
+          Merchant assigned unique request ID.
+
+
+          Multiple requests received with the same request ID in this field will be handled idempotently within the idempotency window.
+        xml:
+          attribute: false
+          wrapped: false
+          name: merchant-request-id
+        type: string
+        minLength: 1
+        maxLength: 50
+      optinId:
+        required: false
+        displayName: optinId
+        description: Unique ID generated by Boku for the opt-in
+        xml:
+          attribute: false
+          wrapped: false
+          name: optin-id
+        type: string
+        minLength: 1
+        maxLength: 50
+      optinRequestId:
+        required: false
+        displayName: optinRequestId
+        description: The merchant assigned ID used as `merchant-request-id` in the original opt-in call
+        xml:
+          attribute: false
+          wrapped: false
+          name: optin-request-id
+        type: string
+        minLength: 1
+        maxLength: 50
+  ConfirmOptinResponse:
+    example:
+      value: |
+        <confirm-optin-response>
+
+          <result>
+
+            <reason-code>0</reason-code>
+
+            <message>Operation Successful</message>
+
+            <retriable>false</retriable>
+
+            <status>OK</status>
+
+          </result>
+
+          <timestamp>2015-02-40 04:44:16</timestamp>
+
+          <merchant-id>gatewaymerchant</merchant-id>
+
+          <merchant-request-id>1002004</merchant-request-id>
+
+          <optin-request-id>1002001</optin-request-id>
+
+          <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>
+
+          <optin-state>
+
+            <optin-status>active</optin-status>
+
+            <country>JP</country>
+
+            <network-id>jp-super</network-id>
+
+            <account-identifier>te****st@boku.com</account-identifier>
+
+            <issuer-unique-user-id>cc1c4f3</issuer-unique-user-id>
+
+          </optin-state>
+
+          <optin-type>hosted</optin-type>
+
+          <payment-method>superwallet</payment-method>
+
+        </confirm-optin-response>
+    displayName: ConfirmOptinResponse
+    description: "'confirm-optin' Response - General Elements"
+    xml:
+      name: confirm-optin-response
+    type: object
+    properties:
+      result:
+        required: true
+        example:
+          value: |
+            <result>
+
+              <reason-code>0</reason-code>
+
+              <message>Operation Successful</message>
+
+              <retriable>false</retriable>
+
+              <status>OK</status>
+
+            </result>
+        displayName: result
+        description: The 'result' element is defined in every response type. It is used to convey the outcome of an API request.
+        xml:
+          attribute: false
+          wrapped: false
+          name: result
+        type: Result
+      timestamp:
+        required: false
+        displayName: timestamp
+        description: |
+          Time request was received ("YYYY-MM-DD hh:mm:ss")
+
+
+          All timestamps are in UTC
+        type: string
+        pattern: ^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$
+      merchantId:
+        required: true
+        displayName: merchantId
+        description: Boku assigned merchant ID
+        xml:
+          attribute: false
+          wrapped: false
+          name: merchant-id
+        type: string
+        maxLength: 50
+      merchantRequestId:
+        required: true
+        displayName: merchantRequestId
+        description: Merchant assigned unique request id
+        xml:
+          attribute: false
+          wrapped: false
+          name: merchant-request-id
+        type: string
+        maxLength: 50
+      optinRequestId:
+        required: false
+        displayName: optinRequestId
+        description: The merchant assigned ID used as `merchant-request-id` in the original opt-in call
+        xml:
+          attribute: false
+          wrapped: false
+          name: optin-request-id
+        type: string
+        maxLength: 50
+      optinId:
+        required: false
+        displayName: optinId
+        description: Boku assigned opt-in id
+        xml:
+          attribute: false
+          wrapped: false
+          name: optin-id
+        type: string
+        maxLength: 24
+      optinState:
+        required: false
+        example:
+          value: |
+            <optin-state>
+
+              <optin-status>pending-validate</optin-status>
+
+              <country>JP</country>
+
+              <network-id>jp-super</network-id>
+
+              <account-identifier>te****st@boku.com</account-identifier>
+
+              <issuer-unique-user-id>cc1c4f3</issuer-unique-user-id>
+
+            </optin-state>
+        displayName: optinState
+        description: Gives the state of the opt-in at the time this response was returned
+        xml:
+          attribute: false
+          wrapped: false
+          name: optin-state
+        type: OptinState
+      paymentMethod:
+        required: false
+        displayName: paymentMethod
+        description: The payment method selected
+        xml:
+          attribute: false
+          wrapped: false
+          name: payment-method
+        type: string
+        maxLength: 50
+      optinType:
+        required: true
+        displayName: optinType
+        description: Which method to use to perform opt-in.
+        xml:
+          attribute: false
+          wrapped: false
+          name: optin-type
+        type: string
+        enum:
+        - hosted
+  InvalidRequestField:
+    example:
+      value: <field path="hosted" reason="may not be null" />
+    displayName: InvalidRequestField
+    description: Provides per-field error information in the case where the submitted request did not satisfy validation constraints.
+    xml:
+      name: field
+    type: object
+    properties:
+      path:
+        required: false
+        displayName: path
+        description: |
+          Property path of the field that was in error. The element or attribute name is given in camel-case, with nested objects delimited by `.` (period)
+
+
+          If there are multiple distinct errors regarding a particular field, it may appear more than once. I.e. `field[path]` is not necessarily unique.
+        xml:
+          attribute: true
+          wrapped: false
+        type: string
+      reason:
+        required: false
+        displayName: reason
+        description: A descriptive reason why the field was invalid. This message is not localized and so is not appropriate for user messaging.
+        xml:
+          attribute: true
+          wrapped: false
+        type: string
+  OptinRequest:
+    example:
+      value: |
+        <optin-request>
+
+          <country>JP</country>
+
+          <merchant-id>gatewaymerchant</merchant-id>
+
+          <merchant-request-id>2032405</merchant-request-id>
+
+          <payment-method>superwallet</payment-method>
+
+          <optin-type>hosted</optin-type>
+
+          <hosted>
+
+            <forward-url>https://merchant.com/redirect/2032405</forward-url>
+
+          </hosted>
+
+        </optin-request>
+    displayName: OptinRequest
+    description: "'optin' Request - General Parameters"
+    xml:
+      name: optin-request
+    type: object
+    properties:
+      country:
+        required: true
+        displayName: country
+        description: Country code in ISO 3166-1-alpha-2 standard
+        type: string
+        pattern: ^[A-Z]{2}$
+      merchantId:
+        required: true
+        displayName: merchantId
+        description: Boku assigned merchant ID
+        xml:
+          attribute: false
+          wrapped: false
+          name: merchant-id
+        type: string
+        minLength: 1
+        maxLength: 50
+      merchantRequestId:
+        required: true
+        displayName: merchantRequestId
+        description: |
+          Merchant assigned unique request ID.
+
+
+          Multiple requests received with the same request ID in this field will be handled idempotently within the idempotency window.
+        xml:
+          attribute: false
+          wrapped: false
+          name: merchant-request-id
+        type: string
+        minLength: 1
+        maxLength: 50
+      merchantConsumerId:
+        required: false
+        displayName: merchantConsumerId
+        description: Consumer id assigned by merchant
+        xml:
+          attribute: false
+          wrapped: false
+          name: merchant-consumer-id
+        type: string
+        minLength: 1
+        maxLength: 64
+      paymentMethod:
+        required: true
+        displayName: paymentMethod
+        description: |
+          The payment method the consumer has selected:
+
+
+          * Each wallet provider will be its own payment method. A list of available values will be provided on demand.
+        xml:
+          attribute: false
+          wrapped: false
+          name: payment-method
+        type: string
+        minLength: 1
+        maxLength: 50
+      optinType:
+        required: true
+        displayName: optinType
+        description: Which method to use to perform opt-in.
+        xml:
+          attribute: false
+          wrapped: false
+          name: optin-type
+        type: string
+        enum:
+        - hosted
+      hosted:
+        required: true
+        example:
+          value: |
+            <hosted>
+
+              <forward-url>https://merchant.com/redirect/2032405</forward-url>
+
+            </hosted>
+        displayName: hosted
+        description: Container element for parameters relevant when optin-type is 'hosted'
+        xml:
+          attribute: false
+          wrapped: false
+          name: hosted
+        type: OptinRequestHosted
+      sellerOfRecord:
+        required: false
+        example:
+          value: |
+            <seller-of-record>
+
+              <id>73tdolramou0m6jnqyb6pkk3</id>
+
+            </seller-of-record>
+        displayName: sellerOfRecord
+        description: Optin and Charge Request API can be made for specific Seller of Record previously registered with Boku.
+        xml:
+          attribute: false
+          wrapped: false
+          name: seller-of-record
+        type: SellerOfRecord
+      notificationUrl:
+        required: false
+        displayName: notificationUrl
+        xml:
+          attribute: false
+          wrapped: false
+          name: notification-url
+        type: string
+        minLength: 1
+        maxLength: 255
+  OptinRequestHosted:
+    example:
+      value: |
+        <hosted>
+
+          <forward-url>https://merchant.com/redirect/2032405</forward-url>
+
+        </hosted>
+    displayName: OptinRequestHosted
+    description: Container element for parameters relevant when optin-type is 'hosted'
+    xml:
+      name: hosted
+    type: object
+    properties:
+      forwardUrl:
+        required: true
+        displayName: forwardUrl
+        description: Supplies the URL for Boku to redirect the consumer back to the merchant UI to complete authentication.
+        xml:
+          attribute: false
+          wrapped: false
+          name: forward-url
+        type: string
+        minLength: 1
+        maxLength: 2048
+      useMobileFlow:
+        required: false
+        default: 'false'
+        displayName: useMobileFlow
+        description: |
+          True if a mobile-optimized optin flow should be used for this request, false otherwise.
+
+
+          Example: A non-mobile-optimized flow could display a QR code on the user's mobile. The user would be unable to scan the QR code because they are already on their mobile.
+
+
+          A mobile-optimized flow could display a mobile login page to the user.
+        xml:
+          attribute: false
+          wrapped: false
+          name: use-mobile-flow
+        type: boolean
+      qrInfo:
+        required: false
+        displayName: qrInfo
+        type: OptinRequestQrInfo
+  OptinRequestQrInfo:
+    displayName: OptinRequestQrInfo
+    type: object
+    properties:
+      type:
+        required: true
+        displayName: type
+        type: string
+        enum:
+        - QR_CONTENT
+        - QR_IMAGE_LINK
+  OptinResponse:
+    example:
+      value: |
+        <optin-response>
+
+          <result>
+
+            <reason-code>0</reason-code>
+
+            <message>Operation Successful</message>
+
+            <retriable>false</retriable>
+
+            <status>OK</status>
+
+          </result>
+
+          <timestamp>2015-02-40 04:44:16</timestamp>
+
+          <merchant-id>gatewaymerchant</merchant-id>
+
+          <merchant-request-id>2032405</merchant-request-id>
+
+          <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>
+
+          <optin-state>
+
+            <optin-status>pending-validate</optin-status>
+
+            <country>JP</country>
+
+            <network-id>jp-super</network-id>
+
+            <account-identifier>te****st@boku.com</account-identifier>
+
+            <issuer-unique-user-id>cc1c4f3</issuer-unique-user-id>
+
+          </optin-state>
+
+          <optin-type>hosted</optin-type>
+
+          <hosted>
+
+            <optin-url>https://www.issuer.com/optin/2032405</optin-url>
+
+          </hosted>
+
+          <payment-method>superwallet</payment-method>
+
+        </optin-response>
+    displayName: OptinResponse
+    description: "'optin' Response - General Parameters"
+    xml:
+      name: optin-response
+    type: object
+    properties:
+      result:
+        required: true
+        example:
+          value: |
+            <result>
+
+              <reason-code>0</reason-code>
+
+              <message>Operation Successful</message>
+
+              <retriable>false</retriable>
+
+              <status>OK</status>
+
+            </result>
+        displayName: result
+        description: The 'result' element is defined in every response type. It is used to convey the outcome of an API request.
+        xml:
+          attribute: false
+          wrapped: false
+          name: result
+        type: Result
+      timestamp:
+        required: false
+        displayName: timestamp
+        description: |
+          Time request was received ("YYYY-MM-DD hh:mm:ss").
+
+
+          All timestamps are in UTC.
+        type: string
+        pattern: ^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$
+      merchantRequestId:
+        required: true
+        displayName: merchantRequestId
+        description: Merchant assigned unique request ID
+        xml:
+          attribute: false
+          wrapped: false
+          name: merchant-request-id
+        type: string
+        maxLength: 50
+      merchantId:
+        required: true
+        displayName: merchantId
+        description: Boku assigned merchant ID
+        xml:
+          attribute: false
+          wrapped: false
+          name: merchant-id
+        type: string
+        maxLength: 50
+      optinId:
+        required: false
+        displayName: optinId
+        description: Unique ID generated by Boku for the opt-in
+        xml:
+          attribute: false
+          wrapped: false
+          name: optin-id
+        type: string
+        maxLength: 24
+      optinState:
+        required: false
+        example:
+          value: |
+            <optin-state>
+
+              <optin-status>pending-validate</optin-status>
+
+              <country>JP</country>
+
+              <network-id>jp-super</network-id>
+
+              <account-identifier>te****st@boku.com</account-identifier>
+
+              <issuer-unique-user-id>cc1c4f3</issuer-unique-user-id>
+
+            </optin-state>
+        displayName: optinState
+        description: Gives the state of the opt-in at the time this response was returned
+        xml:
+          attribute: false
+          wrapped: false
+          name: optin-state
+        type: OptinState
+      paymentMethod:
+        required: false
+        displayName: paymentMethod
+        description: The payment method selected
+        xml:
+          attribute: false
+          wrapped: false
+          name: payment-method
+        type: string
+        maxLength: 50
+      optinType:
+        required: false
+        displayName: optinType
+        description: Which method to use to perform opt-in.
+        xml:
+          attribute: false
+          wrapped: false
+          name: optin-type
+        type: string
+        enum:
+        - hosted
+      hosted:
+        required: false
+        example:
+          value: |
+            <hosted>
+
+              <optin-url>https://www.issuer.com/optin/2032405</optin-url>
+
+            </hosted>
+        displayName: hosted
+        description: Provides information for proceeding with a hosted opt-in
+        xml:
+          attribute: false
+          wrapped: false
+          name: hosted
+        type: OptinResponseHosted
+      sellerOfRecord:
+        required: false
+        example:
+          value: |
+            <seller-of-record>
+
+              <id>73tdolramou0m6jnqyb6pkk3</id>
+
+            </seller-of-record>
+        displayName: sellerOfRecord
+        description: Optin and Charge Request API can be made for specific Seller of Record previously registered with Boku.
+        xml:
+          attribute: false
+          wrapped: false
+          name: seller-of-record
+        type: SellerOfRecord
+  OptinResponseHosted:
+    example:
+      value: |
+        <hosted>
+
+          <optin-url>https://www.issuer.com/optin/2032405</optin-url>
+
+        </hosted>
+    displayName: OptinResponseHosted
+    description: Provides information for proceeding with a hosted opt-in
+    xml:
+      name: hosted
+    type: object
+    properties:
+      optinUrl:
+        required: true
+        displayName: optinUrl
+        description: Boku provided URL that provides the opt-in UI for the consumer.
+        xml:
+          attribute: false
+          wrapped: false
+          name: optin-url
+        type: string
+        maxLength: 2048
+      qrInfo:
+        required: false
+        displayName: qrInfo
+        type: OptinResponseQrInfo
+  OptinResponseQrInfo:
+    displayName: OptinResponseQrInfo
+    type: object
+    properties:
+      type:
+        required: true
+        displayName: type
+        type: string
+        enum:
+        - QR_CONTENT
+        - QR_IMAGE_LINK
+      source:
+        required: true
+        displayName: source
+        type: string
+  OptinState:
+    example:
+      value: |
+        <optin-state>
+
+          <optin-status>pending-validate</optin-status>
+
+          <country>JP</country>
+
+          <network-id>jp-super</network-id>
+
+          <account-identifier>te****st@boku.com</account-identifier>
+
+          <issuer-unique-user-id>cc1c4f3</issuer-unique-user-id>
+
+        </optin-state>
+    displayName: OptinState
+    description: Gives the state of the opt-in at the time this response was returned
+    xml:
+      name: optin-state
+    type: object
+    properties:
+      optinStatus:
+        required: true
+        displayName: optinStatus
+        description: Gives the status of the opt-in at the time this response was returned
+        xml:
+          attribute: false
+          wrapped: false
+          name: optin-status
+        type: string
+        enum:
+        - pending-validate
+        - pending-confirm
+        - active
+        - closed
+      networkId:
+        required: false
+        displayName: networkId
+        description: The internal network ID of the user, as declared in `network-info` -> `network[id]`
+        xml:
+          attribute: false
+          wrapped: false
+          name: network-id
+        type: string
+        maxLength: 10
+      country:
+        required: true
+        displayName: country
+        description: Country code in ISO 3166-1-alpha-2 standard
+        type: string
+        pattern: ^[A-Z]{2}$
+      accountIdentifier:
+        required: false
+        displayName: accountIdentifier
+        description: Free-text consumer account identifier provided by the payment provider. This value will be recognizable to the user and might not be unique.
+        xml:
+          attribute: false
+          wrapped: false
+          name: account-identifier
+        type: string
+        maxLength: 100
+      issuerUniqueUserId:
+        required: false
+        displayName: issuerUniqueUserId
+        description: Unique user id provided by the payment provider. This value could be an id that is not recognizable to the user.
+        xml:
+          attribute: false
+          wrapped: false
+          name: issuer-unique-user-id
+        type: string
+        maxLength: 255
+  Result:
+    example:
+      value: |
+        <result>
+
+          <reason-code>0</reason-code>
+
+          <message>Operation Successful</message>
+
+          <retriable>false</retriable>
+
+          <status>OK</status>
+
+        </result>
+    displayName: Result
+    description: The 'result' element is defined in every response type. It is used to convey the outcome of an API request.
+    xml:
+      name: result
+    type: object
+    properties:
+      status:
+        required: true
+        displayName: status
+        description: The status of the operation
+        xml:
+          attribute: false
+          wrapped: false
+        type: string
+        enum:
+        - OK
+        - ERROR
+      reasonCode:
+        required: true
+        displayName: reasonCode
+        description: Provides additional information for the status
+        xml:
+          attribute: false
+          wrapped: false
+          name: reason-code
+        type: integer
+        format: int32
+      message:
+        required: true
+        displayName: message
+        description: Description of the reason code
+        type: string
+      retriable:
+        required: true
+        displayName: retriable
+        description: '**true** if the request can be retried; **false** otherwise'
+        type: boolean
+      retryDelay:
+        required: false
+        displayName: retryDelay
+        description: Minimum milliseconds to delay before re-trying request
+        xml:
+          attribute: false
+          wrapped: false
+          name: retry-delay
+        type: integer
+        format: int32
+      invalidRequestFields:
+        required: false
+        displayName: invalidRequestFields
+        xml:
+          attribute: false
+          wrapped: true
+          name: invalid-request-fields
+        type: array
+        items:
+          type: InvalidRequestField
+  SellerOfRecord:
+    example:
+      value: |
+        <seller-of-record>
+
+          <id>73tdolramou0m6jnqyb6pkk3</id>
+
+        </seller-of-record>
+    displayName: SellerOfRecord
+    description: Optin and Charge Request API can be made for specific Seller of Record previously registered with Boku.
+    xml:
+      name: seller-of-record
+    type: object
+    properties:
+      id:
+        required: true
+        displayName: id
+        description: ID of seller of record previously registered with Boku. Boku generated Seller of Record id will be 24 character alpha-numeric string.
+        type: string
+        minLength: 1
+        maxLength: 24
+  Timeout:
+    example:
+      value: <timeout after="10000" />
+    displayName: Timeout
+    description: Specifies how long to block waiting for a response
+    xml:
+      name: timeout
+    type: object
+    properties:
+      after:
+        required: true
+        displayName: after
+        description: Maximum time to block before returning a response, in milliseconds. The value `0` means do not block, and there is no way to specify infinity.
+        xml:
+          attribute: true
+          wrapped: false
+        type: integer
+        minimum: 0
+        maximum: 60000
+        format: int64
+  ValidateOptinRequest:
+    example:
+      value: |
+        <validate-optin-request>
+
+          <merchant-id>gatewaymerchant</merchant-id>
+
+          <merchant-request-id>2032405</merchant-request-id>
+
+          <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>
+
+          <optin-type>hosted</optin-type>
+
+        </validate-optin-request>
+    displayName: ValidateOptinRequest
+    description: "'validate-optin' Request - General Parameters"
+    xml:
+      name: validate-optin-request
+    type: object
+    properties:
+      merchantId:
+        required: true
+        displayName: merchantId
+        description: Boku assigned merchant ID
+        xml:
+          attribute: false
+          wrapped: false
+          name: merchant-id
+        type: string
+        minLength: 1
+        maxLength: 50
+      merchantRequestId:
+        required: true
+        displayName: merchantRequestId
+        description: |
+          Merchant assigned unique request ID.
+
+
+          Multiple requests received with the same request ID in this field will be handled idempotently within the idempotency window.
+        xml:
+          attribute: false
+          wrapped: false
+          name: merchant-request-id
+        type: string
+        minLength: 1
+        maxLength: 50
+      optinId:
+        required: false
+        displayName: optinId
+        description: Unique ID generated by Boku for the opt-in
+        xml:
+          attribute: false
+          wrapped: false
+          name: optin-id
+        type: string
+        minLength: 1
+        maxLength: 50
+      optinRequestId:
+        required: false
+        displayName: optinRequestId
+        description: The merchant assigned ID used as `merchant-request-id` in the original opt-in call
+        xml:
+          attribute: false
+          wrapped: false
+          name: optin-request-id
+        type: string
+        minLength: 1
+        maxLength: 50
+      optinType:
+        required: true
+        displayName: optinType
+        description: Which method to use to perform opt-in.
+        xml:
+          attribute: false
+          wrapped: false
+          name: optin-type
+        type: string
+        enum:
+        - hosted
+      timeout:
+        required: false
+        example:
+          value: <timeout after="10000" />
+        displayName: timeout
+        description: Specifies how long to block waiting for a response
+        xml:
+          attribute: false
+          wrapped: false
+          name: timeout
+        type: Timeout
+  ValidateOptinResponse:
+    example:
+      value: |
+        <validate-optin-response>
+
+          <result>
+
+            <reason-code>0</reason-code>
+
+            <message>Operation Successful</message>
+
+            <retriable>false</retriable>
+
+            <status>OK</status>
+
+          </result>
+
+          <merchant-id>gatewaymerchant</merchant-id>
+
+          <merchant-request-id>2032405</merchant-request-id>
+
+          <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>
+
+          <optin-state>
+
+            <optin-status>pending-confirm</optin-status>
+
+            <country>JP</country>
+
+            <network-id>jp-super</network-id>
+
+            <account-identifier>te****st@boku.com</account-identifier>
+
+            <issuer-unique-user-id>cc1c4f3</issuer-unique-user-id>
+
+          </optin-state>
+
+          <optin-type>hosted</optin-type>
+
+          <payment-method>superwallet</payment-method>
+
+        </validate-optin-response>
+    displayName: ValidateOptinResponse
+    description: "'validate-optin' Response - General Elements"
+    xml:
+      name: validate-optin-response
+    type: object
+    properties:
+      result:
+        required: true
+        example:
+          value: |
+            <result>
+
+              <reason-code>0</reason-code>
+
+              <message>Operation Successful</message>
+
+              <retriable>false</retriable>
+
+              <status>OK</status>
+
+            </result>
+        displayName: result
+        description: The 'result' element is defined in every response type. It is used to convey the outcome of an API request.
+        xml:
+          attribute: false
+          wrapped: false
+          name: result
+        type: Result
+      merchantId:
+        required: true
+        displayName: merchantId
+        description: Boku assigned merchant ID
+        xml:
+          attribute: false
+          wrapped: false
+          name: merchant-id
+        type: string
+        maxLength: 50
+      merchantRequestId:
+        required: true
+        displayName: merchantRequestId
+        description: Merchant assigned unique request id
+        xml:
+          attribute: false
+          wrapped: false
+          name: merchant-request-id
+        type: string
+        maxLength: 50
+      optinRequestId:
+        required: false
+        displayName: optinRequestId
+        description: The merchant assigned ID used as `merchant-request-id` in the original opt-in call
+        xml:
+          attribute: false
+          wrapped: false
+          name: optin-request-id
+        type: string
+        maxLength: 50
+      optinId:
+        required: false
+        displayName: optinId
+        description: Boku assigned opt-in id
+        xml:
+          attribute: false
+          wrapped: false
+          name: optin-id
+        type: string
+        maxLength: 24
+      optinState:
+        required: false
+        example:
+          value: |
+            <optin-state>
+
+              <optin-status>pending-validate</optin-status>
+
+              <country>JP</country>
+
+              <network-id>jp-super</network-id>
+
+              <account-identifier>te****st@boku.com</account-identifier>
+
+              <issuer-unique-user-id>cc1c4f3</issuer-unique-user-id>
+
+            </optin-state>
+        displayName: optinState
+        description: Gives the state of the opt-in at the time this response was returned
+        xml:
+          attribute: false
+          wrapped: false
+          name: optin-state
+        type: OptinState
+      paymentMethod:
+        required: false
+        displayName: paymentMethod
+        description: The payment method selected
+        xml:
+          attribute: false
+          wrapped: false
+          name: payment-method
+        type: string
+        maxLength: 50
+      optinType:
+        required: false
+        displayName: optinType
+        description: Which method to use to perform opt-in.
+        xml:
+          attribute: false
+          wrapped: false
+          name: optin-type
+        type: string
+        enum:
+        - hosted
+/optin/3.0:
+  /optin:
+    post:
+      displayName: optin
+      description: |
+        The 'optin' call initiates the consumer authentication process. After an `optin` call, an opt-in is usually in status `pending-validate`.
+
+
+        The optin call types are
+
+
+        * 'hosted' - redirect the consumer to an issuer-provided UI to perform verification.
+
+
+        The 'optin' call is used in conjunction with the following related methods in order to complete consumer approval:
+
+
+        * 'validate-optin' - identify and validate the billing account the consumer is registering as   their payment method.
+
+        * 'confirm-optin' - confirm that the associated 'optin' should be activated for billing.
+
+
+        It is possible to restrict an optin to be used for a single charge by specifying the 'terms' element. When provided, the system will only allow a single 'charge' request to be made for this optin.
+      body:
+        application/xml:
+          examples:
+            Example Hosted 'optin' request XML:
+              description: Example Hosted 'optin' request XML
+              value: |
+                <optin-request>
+
+                  <country>JP</country>
+
+                  <merchant-id>gatewaymerchant</merchant-id>
+
+                  <merchant-request-id>2032405</merchant-request-id>
+
+                  <payment-method>superwallet</payment-method>
+
+                  <optin-type>hosted</optin-type>
+
+                  <hosted>
+
+                    <forward-url>https://merchant.com/redirect/2032405</forward-url>
+
+                  </hosted>
+
+                  <seller-of-record>
+
+                    <id>73tdolramou0m6jnqyb6pkk3</id>
+
+                  </seller-of-record>
+
+                </optin-request>
+          displayName: body
+          xml:
+            attribute: false
+            wrapped: false
+            name: optin-request
+          type: OptinRequest
+      headers:
+        Content-Type:
+          required: true
+          displayName: Content-Type
+          type: string
+          enum:
+          - application/xml
+      responses:
+        '200':
+          description: ''
+          body:
+            application/xml:
+              examples:
+                Example in progress Hosted 'optin' response XML:
+                  description: Example in progress Hosted 'optin' response XML
+                  value: |
+                    <optin-response>
+
+                      <result>
+
+                        <reason-code>0</reason-code>
+
+                        <message>Operation Successful</message>
+
+                        <retriable>false</retriable>
+
+                        <status>OK</status>
+
+                      </result>
+
+                      <timestamp>2015-02-40 04:44:16</timestamp>
+
+                      <merchant-id>gatewaymerchant</merchant-id>
+
+                      <merchant-request-id>2032405</merchant-request-id>
+
+                      <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>
+
+                      <optin-state>
+
+                        <optin-status>pending-validate</optin-status>
+
+                        <country>JP</country>
+
+                        <network-id>jp-super</network-id>
+
+                        <account-identifier>te****st@boku.com</account-identifier>
+
+                        <issuer-unique-user-id>cc1c4f3</issuer-unique-user-id>
+
+                      </optin-state>
+
+                      <optin-type>hosted</optin-type>
+
+                      <hosted>
+
+                        <optin-url>https://www.issuer.com/optin/2032405</optin-url>
+
+                      </hosted>
+
+                      <payment-method>superwallet</payment-method>
+
+                    </optin-response>
+                Example in progress Hosted 'optin' for seller of record response XML:
+                  description: Example in progress Hosted 'optin' for seller of record response XML
+                  value: |
+                    <optin-response>
+
+                      <result>
+
+                        <reason-code>0</reason-code>
+
+                        <message>Operation Successful</message>
+
+                        <retriable>false</retriable>
+
+                        <status>OK</status>
+
+                      </result>
+
+                      <timestamp>2015-02-40 04:44:16</timestamp>
+
+                      <merchant-id>gatewaymerchant</merchant-id>
+
+                      <merchant-request-id>2032405</merchant-request-id>
+
+                      <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>
+
+                      <optin-state>
+
+                        <optin-status>pending-validate</optin-status>
+
+                        <country>JP</country>
+
+                        <network-id>jp-super</network-id>
+
+                        <account-identifier>te****st@boku.com</account-identifier>
+
+                        <issuer-unique-user-id>cc1c4f3</issuer-unique-user-id>
+
+                      </optin-state>
+
+                      <optin-type>hosted</optin-type>
+
+                      <hosted>
+
+                        <optin-url>https://www.issuer.com/optin/2032405</optin-url>
+
+                      </hosted>
+
+                      <payment-method>superwallet</payment-method>
+
+                      <seller-of-record>
+
+                        <id>73tdolramou0m6jnqyb6pkk3</id>
+
+                      </seller-of-record>
+
+                    </optin-response>
+              displayName: response200
+              description: "'optin' Response - General Parameters"
+              xml:
+                attribute: false
+                wrapped: false
+                name: optin-response
+              type: OptinResponse
+  /validate-optin:
+    post:
+      displayName: validateOptin
+      description: |
+        The main purpose of an opt-in is to identify and verify the payment method that the end-user wants to register. In the process, the user confirms that they have control over the corresponding payment method. Once an opt-in has begun via an `optin` API call, the `validate-optin` call is used to complete this verification and in most cases retrieve the end-user details such as the account identifier of the user.
+
+
+        Specifically
+
+
+        * **hosted**: Confirm successful authentication via opt-in UI, and retrieve the account   identifier of the user.
+
+
+        After a successful `validate-optin` call, an opt-in should usually be in status `pending-confirm` awaiting a call to `confirm-optin`.
+      body:
+        application/xml:
+          examples:
+            Example Hosted 'validate-optin' request XML:
+              description: Example Hosted 'validate-optin' request XML
+              value: |
+                <validate-optin-request>
+
+                  <merchant-id>gatewaymerchant</merchant-id>
+
+                  <merchant-request-id>2032405</merchant-request-id>
+
+                  <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>
+
+                  <optin-type>hosted</optin-type>
+
+                </validate-optin-request>
+          displayName: body
+          xml:
+            attribute: false
+            wrapped: false
+            name: validate-optin-request
+          type: ValidateOptinRequest
+      headers:
+        Content-Type:
+          required: true
+          displayName: Content-Type
+          type: string
+          enum:
+          - application/xml
+      responses:
+        '200':
+          description: ''
+          body:
+            application/xml:
+              examples:
+                Example Hosted 'validate-optin' response XML:
+                  description: Example Hosted 'validate-optin' response XML
+                  value: |
+                    <validate-optin-response>
+
+                      <result>
+
+                        <reason-code>0</reason-code>
+
+                        <message>Operation Successful</message>
+
+                        <retriable>false</retriable>
+
+                        <status>OK</status>
+
+                      </result>
+
+                      <merchant-id>gatewaymerchant</merchant-id>
+
+                      <merchant-request-id>2032405</merchant-request-id>
+
+                      <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>
+
+                      <optin-state>
+
+                        <optin-status>pending-confirm</optin-status>
+
+                        <country>JP</country>
+
+                        <network-id>jp-super</network-id>
+
+                        <account-identifier>te****st@boku.com</account-identifier>
+
+                        <issuer-unique-user-id>cc1c4f3</issuer-unique-user-id>
+
+                      </optin-state>
+
+                      <optin-type>hosted</optin-type>
+
+                      <payment-method>superwallet</payment-method>
+
+                    </validate-optin-response>
+              displayName: response200
+              description: "'validate-optin' Response - General Elements"
+              xml:
+                attribute: false
+                wrapped: false
+                name: validate-optin-response
+              type: ValidateOptinResponse
+  /confirm-optin:
+    post:
+      displayName: confirmOptin
+      description: Assuming an opt-in is in state `pending-confirm` (i.e. all necessary information about the end-user has already been collected), this call confirms that the opt-in should be activated for billing (after a successful call, optin-status should be `active`).
+      body:
+        application/xml:
+          examples:
+            Example 'confirm-optin' request XML:
+              description: Example 'confirm-optin' request XML
+              value: |
+                <confirm-optin-request>
+
+                  <merchant-id>gatewaymerchant</merchant-id>
+
+                  <merchant-request-id>1002004</merchant-request-id>
+
+                  <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>
+
+                </confirm-optin-request>
+          displayName: body
+          xml:
+            attribute: false
+            wrapped: false
+            name: confirm-optin-request
+          type: ConfirmOptinRequest
+      headers:
+        Content-Type:
+          required: true
+          displayName: Content-Type
+          type: string
+          enum:
+          - application/xml
+      responses:
+        '200':
+          description: ''
+          body:
+            application/xml:
+              examples:
+                Example 'confirm-optin' response XML:
+                  description: Example 'confirm-optin' response XML
+                  value: |
+                    <confirm-optin-response>
+
+                      <result>
+
+                        <reason-code>0</reason-code>
+
+                        <message>Operation Successful</message>
+
+                        <retriable>false</retriable>
+
+                        <status>OK</status>
+
+                      </result>
+
+                      <timestamp>2015-02-40 04:44:16</timestamp>
+
+                      <merchant-id>gatewaymerchant</merchant-id>
+
+                      <merchant-request-id>1002004</merchant-request-id>
+
+                      <optin-request-id>1002001</optin-request-id>
+
+                      <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>
+
+                      <optin-state>
+
+                        <optin-status>active</optin-status>
+
+                        <country>JP</country>
+
+                        <network-id>jp-super</network-id>
+
+                        <account-identifier>te****st@boku.com</account-identifier>
+
+                        <issuer-unique-user-id>cc1c4f3</issuer-unique-user-id>
+
+                      </optin-state>
+
+                      <optin-type>hosted</optin-type>
+
+                      <payment-method>superwallet</payment-method>
+
+                    </confirm-optin-response>
+              displayName: response200
+              description: "'confirm-optin' Response - General Elements"
+              xml:
+                attribute: false
+                wrapped: false
+                name: confirm-optin-response
+              type: ConfirmOptinResponse
+  /cancel-optin:
+    post:
+      displayName: cancelOptin
+      description: |
+        The purpose of the ‘cancel-optin’ API is for deactivating the consumer’s opt-in stored by Boku and the issuer.
+
+
+        A merchant can use this method in the following possible scenarios:
+
+
+        * User contacts the merchant requesting to remove their payment method
+
+        * Merchant determines that the consumer’s billing account has encountered a permanent error   that should not be retried in the future
+
+
+        A cancel-optin request **must** be sent when a user removes the payment method from the merchant account. Various payment methods enforce a 1:1 mapping, that is, a single payment method account can only be associated to a single merchant account. In the case that the merchant does not call cancel-optin, a user would be unable to associate their payment method account with any other merchant account, even though the user has already requested to remove the payment method from the merchant account.
+
+
+        The 'optin-id' received from the 'optin' request at the time the consumer added their payment method must be supplied in the 'cancel-optin' request.
+      body:
+        application/xml:
+          examples:
+            Example 'cancel-optin' request XML:
+              description: Example 'cancel-optin' request XML
+              value: |
+                <cancel-optin-request>
+
+                  <merchant-id>gatewaymerchant</merchant-id>
+
+                  <merchant-request-id>1002006</merchant-request-id>
+
+                  <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>
+
+                </cancel-optin-request>
+          displayName: body
+          xml:
+            attribute: false
+            wrapped: false
+            name: cancel-optin-request
+          type: CancelOptinRequest
+      headers:
+        Content-Type:
+          required: true
+          displayName: Content-Type
+          type: string
+          enum:
+          - application/xml
+      responses:
+        '200':
+          description: ''
+          body:
+            application/xml:
+              examples:
+                "'cancel-optin' Success Example Response XML":
+                  description: "'cancel-optin' Success Example Response XML"
+                  value: |
+                    <cancel-optin-response>
+
+                      <result>
+
+                        <reason-code>0</reason-code>
+
+                        <message>Operation Successful</message>
+
+                        <retriable>false</retriable>
+
+                        <status>OK</status>
+
+                      </result>
+
+                      <merchant-id>gatewaymerchant</merchant-id>
+
+                      <merchant-request-id>1002006</merchant-request-id>
+
+                      <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>
+
+                      <optin-state>
+
+                        <optin-status>closed</optin-status>
+
+                        <country>DE</country>
+
+                        <network-id>de-super</network-id>
+
+                      </optin-state>
+
+                      <optin-type>hosted</optin-type>
+
+                    </cancel-optin-response>
+                "'cancel-optin' Failed Example Response XML":
+                  description: "'cancel-optin' Failed Example Response XML"
+                  value: |
+                    <cancel-optin-response>
+
+                      <result>
+
+                        <reason-code>125</reason-code>
+
+                        <message>Optin Not Found</message>
+
+                        <retriable>false</retriable>
+
+                        <status>ERROR</status>
+
+                      </result>
+
+                      <merchant-id>gatewaymerchant</merchant-id>
+
+                      <merchant-request-id>1002007</merchant-request-id>
+
+                      <optin-id>fNEpoAAAAAFDSAAAAAAAAA</optin-id>
+
+                    </cancel-optin-response>
+              displayName: response200
+              description: "'cancel-optin' Response - General Elements"
+              xml:
+                attribute: false
+                wrapped: false
+                name: cancel-optin-response
+              type: CancelOptinResponse

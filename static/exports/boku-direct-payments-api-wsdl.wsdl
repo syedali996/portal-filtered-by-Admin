@@ -1,0 +1,1035 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:schemas="https://jp-api4-stage.boku.com/schemas" xmlns:wsdl="https://jp-api4-stage.boku.com/wsdl" targetNamespace="https://jp-api4-stage.boku.com/wsdl" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <xs:schema xmlns:tns="https://jp-api4-stage.boku.com/schemas" targetNamespace="https://jp-api4-stage.boku.com/schemas" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="POST_optin_InputMessage" type="schemas:POST_optin_InputMessage" />
+      <xs:element name="POST_optin_OutputMessage" type="schemas:POST_optin_OutputMessage" />
+      <xs:element name="POST_validateOptin_InputMessage" type="schemas:POST_validateOptin_InputMessage" />
+      <xs:element name="POST_validateOptin_OutputMessage" type="schemas:POST_validateOptin_OutputMessage" />
+      <xs:element name="POST_confirmOptin_InputMessage" type="schemas:POST_confirmOptin_InputMessage" />
+      <xs:element name="POST_confirmOptin_OutputMessage" type="schemas:POST_confirmOptin_OutputMessage" />
+      <xs:element name="POST_cancelOptin_InputMessage" type="schemas:POST_cancelOptin_InputMessage" />
+      <xs:element name="POST_cancelOptin_OutputMessage" type="schemas:POST_cancelOptin_OutputMessage" />
+      <xs:complexType name="cancel-optin-request">
+        <xs:annotation>
+          <xs:documentation>'cancel-optin' Request - General Parameters</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element minOccurs="1" name="merchant-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Boku assigned merchant ID</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+                <xs:minLength value="1" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="1" name="merchant-request-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Merchant assigned unique request ID.
+
+Multiple requests received with the same request ID in this field will be handled idempotently within the idempotency window.</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+                <xs:minLength value="1" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="1" name="optin-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Boku provided opt-in ID for the consumer</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+                <xs:minLength value="1" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="cancel-optin-response">
+        <xs:annotation>
+          <xs:documentation>'cancel-optin' Response - General Elements</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element minOccurs="1" name="result" type="schemas:result">
+            <xs:annotation>
+              <xs:documentation>The 'result' element is defined in every response type. It is used to convey the outcome of an API request.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="1" name="merchant-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Boku assigned merchant ID</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="1" name="merchant-request-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Merchant assigned request ID</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="1" name="optin-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Boku assigned consumer opt-in ID</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="24" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="0" name="optin-type" type="schemas:optin-type">
+            <xs:annotation>
+              <xs:documentation>Which method to use to perform opt-in.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="optin-state" type="schemas:optin-state">
+            <xs:annotation>
+              <xs:documentation>Gives the state of the opt-in at the time this response was returned</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="confirm-optin-request">
+        <xs:annotation>
+          <xs:documentation>'confirm-optin' Request - General Parameters</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element minOccurs="1" name="merchant-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Boku assigned merchant ID</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+                <xs:minLength value="1" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="1" name="merchant-request-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Merchant assigned unique request ID.
+
+Multiple requests received with the same request ID in this field will be handled idempotently within the idempotency window.</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+                <xs:minLength value="1" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="0" name="optin-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Unique ID generated by Boku for the opt-in</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+                <xs:minLength value="1" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="0" name="optin-request-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>The merchant assigned ID used as `merchant-request-id` in the original opt-in call</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+                <xs:minLength value="1" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="confirm-optin-response">
+        <xs:annotation>
+          <xs:documentation>'confirm-optin' Response - General Elements</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element minOccurs="1" name="result" type="schemas:result">
+            <xs:annotation>
+              <xs:documentation>The 'result' element is defined in every response type. It is used to convey the outcome of an API request.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="timestamp">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Time request was received ("YYYY-MM-DD hh:mm:ss")
+
+All timestamps are in UTC</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:pattern value="^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="1" name="merchant-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Boku assigned merchant ID</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="1" name="merchant-request-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Merchant assigned unique request id</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="0" name="optin-request-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>The merchant assigned ID used as `merchant-request-id` in the original opt-in call</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="0" name="optin-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Boku assigned opt-in id</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="24" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="0" name="optin-state" type="schemas:optin-state">
+            <xs:annotation>
+              <xs:documentation>Gives the state of the opt-in at the time this response was returned</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="payment-method">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>The payment method selected</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="1" fixed="hosted" name="optin-type" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>Which method to use to perform opt-in.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="field">
+        <xs:annotation>
+          <xs:documentation>Provides per-field error information in the case where the submitted request did not satisfy validation constraints.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence />
+        <xs:attribute name="path" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>Property path of the field that was in error. The element or attribute name is given in camel-case, with nested objects delimited by `.` (period)
+
+If there are multiple distinct errors regarding a particular field, it may appear more than once. I.e. `field[path]` is not necessarily unique.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="reason" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>A descriptive reason why the field was invalid. This message is not localized and so is not appropriate for user messaging.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:complexType>
+      <xs:complexType name="optin-request">
+        <xs:annotation>
+          <xs:documentation>'optin' Request - General Parameters</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element minOccurs="1" name="country">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Country code in ISO 3166-1-alpha-2 standard</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:pattern value="^[A-Z]{2}$" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="1" name="merchant-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Boku assigned merchant ID</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+                <xs:minLength value="1" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="1" name="merchant-request-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Merchant assigned unique request ID.
+
+Multiple requests received with the same request ID in this field will be handled idempotently within the idempotency window.</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+                <xs:minLength value="1" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="0" name="merchant-consumer-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Consumer id assigned by merchant</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="64" />
+                <xs:minLength value="1" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="1" name="payment-method">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>The payment method the consumer has selected:
+
+* Each wallet provider will be its own payment method. A list of available values will be provided on demand.</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+                <xs:minLength value="1" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="1" fixed="hosted" name="optin-type" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>Which method to use to perform opt-in.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="1" name="hosted" type="schemas:hosted">
+            <xs:annotation>
+              <xs:documentation>Container element for parameters relevant when optin-type is 'hosted'</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="seller-of-record" type="schemas:seller-of-record">
+            <xs:annotation>
+              <xs:documentation>Optin and Charge Request API can be made for specific Seller of Record previously registered with Boku.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="notification-url">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="255" />
+                <xs:minLength value="1" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="hosted">
+        <xs:annotation>
+          <xs:documentation>Container element for parameters relevant when optin-type is 'hosted'</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element minOccurs="1" name="forward-url">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Supplies the URL for Boku to redirect the consumer back to the merchant UI to complete authentication.</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="2048" />
+                <xs:minLength value="1" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="0" default="false" name="use-mobile-flow" type="xs:boolean">
+            <xs:annotation>
+              <xs:documentation>True if a mobile-optimized optin flow should be used for this request, false otherwise.
+
+Example: A non-mobile-optimized flow could display a QR code on the user's mobile. The user would be unable to scan the QR code because they are already on their mobile.
+
+A mobile-optimized flow could display a mobile login page to the user.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="qrInfo" type="schemas:OptinRequestQrInfo" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="OptinRequestQrInfo">
+        <xs:sequence>
+          <xs:element minOccurs="1" name="type" type="schemas:Type" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="optin-response">
+        <xs:annotation>
+          <xs:documentation>'optin' Response - General Parameters</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element minOccurs="1" name="result" type="schemas:result">
+            <xs:annotation>
+              <xs:documentation>The 'result' element is defined in every response type. It is used to convey the outcome of an API request.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="timestamp">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Time request was received ("YYYY-MM-DD hh:mm:ss").
+
+All timestamps are in UTC.</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:pattern value="^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="1" name="merchant-request-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Merchant assigned unique request ID</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="1" name="merchant-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Boku assigned merchant ID</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="0" name="optin-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Unique ID generated by Boku for the opt-in</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="24" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="0" name="optin-state" type="schemas:optin-state">
+            <xs:annotation>
+              <xs:documentation>Gives the state of the opt-in at the time this response was returned</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="payment-method">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>The payment method selected</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="0" name="optin-type" type="schemas:optin-type">
+            <xs:annotation>
+              <xs:documentation>Which method to use to perform opt-in.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="hosted" type="schemas:hosted1">
+            <xs:annotation>
+              <xs:documentation>Provides information for proceeding with a hosted opt-in</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="seller-of-record" type="schemas:seller-of-record">
+            <xs:annotation>
+              <xs:documentation>Optin and Charge Request API can be made for specific Seller of Record previously registered with Boku.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="hosted1">
+        <xs:annotation>
+          <xs:documentation>Provides information for proceeding with a hosted opt-in</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element minOccurs="1" name="optin-url">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Boku provided URL that provides the opt-in UI for the consumer.</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="2048" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="0" name="qrInfo" type="schemas:OptinResponseQrInfo" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="OptinResponseQrInfo">
+        <xs:sequence>
+          <xs:element minOccurs="1" name="type" type="schemas:Type" />
+          <xs:element minOccurs="1" name="source" type="xs:string" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="optin-state">
+        <xs:annotation>
+          <xs:documentation>Gives the state of the opt-in at the time this response was returned</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element minOccurs="1" name="optin-status" type="schemas:optin-status">
+            <xs:annotation>
+              <xs:documentation>Gives the status of the opt-in at the time this response was returned</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="network-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>The internal network ID of the user, as declared in `network-info` -&gt; `network[id]`</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="10" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="1" name="country">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Country code in ISO 3166-1-alpha-2 standard</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:pattern value="^[A-Z]{2}$" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="0" name="account-identifier">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Free-text consumer account identifier provided by the payment provider. This value will be recognizable to the user and might not be unique.</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="100" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="0" name="issuer-unique-user-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Unique user id provided by the payment provider. This value could be an id that is not recognizable to the user.</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="255" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="result">
+        <xs:annotation>
+          <xs:documentation>The 'result' element is defined in every response type. It is used to convey the outcome of an API request.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element minOccurs="1" name="status" type="schemas:ResultStatus">
+            <xs:annotation>
+              <xs:documentation>The status of the operation</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="1" name="reason-code" type="xs:integer">
+            <xs:annotation>
+              <xs:documentation>Provides additional information for the status</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="1" name="message" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>Description of the reason code</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="1" name="retriable" type="xs:boolean">
+            <xs:annotation>
+              <xs:documentation>**true** if the request can be retried; **false** otherwise</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="retry-delay" type="xs:integer">
+            <xs:annotation>
+              <xs:documentation>Minimum milliseconds to delay before re-trying request</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="invalid-request-fields">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="invalidRequestFields" type="schemas:field" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="seller-of-record">
+        <xs:annotation>
+          <xs:documentation>Optin and Charge Request API can be made for specific Seller of Record previously registered with Boku.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element minOccurs="1" name="id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>ID of seller of record previously registered with Boku. Boku generated Seller of Record id will be 24 character alpha-numeric string.</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="24" />
+                <xs:minLength value="1" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="timeout">
+        <xs:annotation>
+          <xs:documentation>Specifies how long to block waiting for a response</xs:documentation>
+        </xs:annotation>
+        <xs:sequence />
+        <xs:attribute name="after">
+          <xs:annotation>
+            <xs:documentation>Maximum time to block before returning a response, in milliseconds. The value `0` means do not block, and there is no way to specify infinity.</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:annotation>
+              <xs:documentation>Maximum time to block before returning a response, in milliseconds. The value `0` means do not block, and there is no way to specify infinity.</xs:documentation>
+            </xs:annotation>
+            <xs:restriction base="xs:long">
+              <xs:maxInclusive value="60000" />
+              <xs:minInclusive value="0" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+      </xs:complexType>
+      <xs:complexType name="validate-optin-request">
+        <xs:annotation>
+          <xs:documentation>'validate-optin' Request - General Parameters</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element minOccurs="1" name="merchant-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Boku assigned merchant ID</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+                <xs:minLength value="1" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="1" name="merchant-request-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Merchant assigned unique request ID.
+
+Multiple requests received with the same request ID in this field will be handled idempotently within the idempotency window.</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+                <xs:minLength value="1" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="0" name="optin-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Unique ID generated by Boku for the opt-in</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+                <xs:minLength value="1" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="0" name="optin-request-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>The merchant assigned ID used as `merchant-request-id` in the original opt-in call</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+                <xs:minLength value="1" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="1" fixed="hosted" name="optin-type" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>Which method to use to perform opt-in.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="timeout" type="schemas:timeout">
+            <xs:annotation>
+              <xs:documentation>Specifies how long to block waiting for a response</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="validate-optin-response">
+        <xs:annotation>
+          <xs:documentation>'validate-optin' Response - General Elements</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element minOccurs="1" name="result" type="schemas:result">
+            <xs:annotation>
+              <xs:documentation>The 'result' element is defined in every response type. It is used to convey the outcome of an API request.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="1" name="merchant-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Boku assigned merchant ID</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="1" name="merchant-request-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Merchant assigned unique request id</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="0" name="optin-request-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>The merchant assigned ID used as `merchant-request-id` in the original opt-in call</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="0" name="optin-id">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>Boku assigned opt-in id</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="24" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="0" name="optin-state" type="schemas:optin-state">
+            <xs:annotation>
+              <xs:documentation>Gives the state of the opt-in at the time this response was returned</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="payment-method">
+            <xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>The payment method selected</xs:documentation>
+              </xs:annotation>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element minOccurs="0" name="optin-type" type="schemas:optin-type">
+            <xs:annotation>
+              <xs:documentation>Which method to use to perform opt-in.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:simpleType name="optin-status">
+        <xs:annotation>
+          <xs:documentation>Gives the status of the opt-in at the time this response was returned</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="pending-validate" />
+          <xs:enumeration value="pending-confirm" />
+          <xs:enumeration value="active" />
+          <xs:enumeration value="closed" />
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="optin-type">
+        <xs:annotation>
+          <xs:documentation>Which method to use to perform opt-in.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="hosted" />
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="ResultStatus">
+        <xs:annotation>
+          <xs:documentation>The status of the operation</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="OK" />
+          <xs:enumeration value="ERROR" />
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="Type">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="QR_CONTENT" />
+          <xs:enumeration value="QR_IMAGE_LINK" />
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="Content-Type">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="application/xml" />
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:complexType name="POST_optin_InputMessage">
+        <xs:sequence>
+          <xs:element minOccurs="1" name="Content-Type" type="schemas:Content-Type" />
+          <xs:element minOccurs="1" name="optin-request" type="schemas:optin-request" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="POST_optin_OutputMessage">
+        <xs:sequence>
+          <xs:element minOccurs="1" name="optin-response" type="schemas:optin-response">
+            <xs:annotation>
+              <xs:documentation>'optin' Response - General Parameters</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="POST_validateOptin_InputMessage">
+        <xs:sequence>
+          <xs:element minOccurs="1" name="Content-Type" type="schemas:Content-Type" />
+          <xs:element minOccurs="1" name="validate-optin-request" type="schemas:validate-optin-request" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="POST_validateOptin_OutputMessage">
+        <xs:sequence>
+          <xs:element minOccurs="1" name="validate-optin-response" type="schemas:validate-optin-response">
+            <xs:annotation>
+              <xs:documentation>'validate-optin' Response - General Elements</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="POST_confirmOptin_InputMessage">
+        <xs:sequence>
+          <xs:element minOccurs="1" name="Content-Type" type="schemas:Content-Type" />
+          <xs:element minOccurs="1" name="confirm-optin-request" type="schemas:confirm-optin-request" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="POST_confirmOptin_OutputMessage">
+        <xs:sequence>
+          <xs:element minOccurs="1" name="confirm-optin-response" type="schemas:confirm-optin-response">
+            <xs:annotation>
+              <xs:documentation>'confirm-optin' Response - General Elements</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="POST_cancelOptin_InputMessage">
+        <xs:sequence>
+          <xs:element minOccurs="1" name="Content-Type" type="schemas:Content-Type" />
+          <xs:element minOccurs="1" name="cancel-optin-request" type="schemas:cancel-optin-request" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="POST_cancelOptin_OutputMessage">
+        <xs:sequence>
+          <xs:element minOccurs="1" name="cancel-optin-response" type="schemas:cancel-optin-response">
+            <xs:annotation>
+              <xs:documentation>'cancel-optin' Response - General Elements</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+  </types>
+  <message name="POST_optin_InputMessage">
+    <part name="POST_optin_InputMessage" element="schemas:POST_optin_InputMessage" />
+  </message>
+  <message name="POST_optin_OutputMessage">
+    <part name="POST_optin_OutputMessage" element="schemas:POST_optin_OutputMessage" />
+  </message>
+  <message name="POST_validateOptin_InputMessage">
+    <part name="POST_validateOptin_InputMessage" element="schemas:POST_validateOptin_InputMessage" />
+  </message>
+  <message name="POST_validateOptin_OutputMessage">
+    <part name="POST_validateOptin_OutputMessage" element="schemas:POST_validateOptin_OutputMessage" />
+  </message>
+  <message name="POST_confirmOptin_InputMessage">
+    <part name="POST_confirmOptin_InputMessage" element="schemas:POST_confirmOptin_InputMessage" />
+  </message>
+  <message name="POST_confirmOptin_OutputMessage">
+    <part name="POST_confirmOptin_OutputMessage" element="schemas:POST_confirmOptin_OutputMessage" />
+  </message>
+  <message name="POST_cancelOptin_InputMessage">
+    <part name="POST_cancelOptin_InputMessage" element="schemas:POST_cancelOptin_InputMessage" />
+  </message>
+  <message name="POST_cancelOptin_OutputMessage">
+    <part name="POST_cancelOptin_OutputMessage" element="schemas:POST_cancelOptin_OutputMessage" />
+  </message>
+  <portType name="Boku_x0020_Direct_x0020_Payments_x0020_API_PortType">
+    <operation name="POST_optin">
+      <documentation>The 'optin' call initiates the consumer authentication process. After an `optin` call, an opt-in is usually in status `pending-validate`.
+
+The optin call types are
+
+* 'hosted' - redirect the consumer to an issuer-provided UI to perform verification.
+
+The 'optin' call is used in conjunction with the following related methods in order to complete consumer approval:
+
+* 'validate-optin' - identify and validate the billing account the consumer is registering as   their payment method.
+* 'confirm-optin' - confirm that the associated 'optin' should be activated for billing.
+
+It is possible to restrict an optin to be used for a single charge by specifying the 'terms' element. When provided, the system will only allow a single 'charge' request to be made for this optin.</documentation>
+      <input message="wsdl:POST_optin_InputMessage" />
+      <output message="wsdl:POST_optin_OutputMessage">
+        <documentation />
+      </output>
+    </operation>
+    <operation name="POST_validateOptin">
+      <documentation>The main purpose of an opt-in is to identify and verify the payment method that the end-user wants to register. In the process, the user confirms that they have control over the corresponding payment method. Once an opt-in has begun via an `optin` API call, the `validate-optin` call is used to complete this verification and in most cases retrieve the end-user details such as the account identifier of the user.
+
+Specifically
+
+* **hosted**: Confirm successful authentication via opt-in UI, and retrieve the account   identifier of the user.
+
+After a successful `validate-optin` call, an opt-in should usually be in status `pending-confirm` awaiting a call to `confirm-optin`.</documentation>
+      <input message="wsdl:POST_validateOptin_InputMessage" />
+      <output message="wsdl:POST_validateOptin_OutputMessage">
+        <documentation />
+      </output>
+    </operation>
+    <operation name="POST_confirmOptin">
+      <documentation>Assuming an opt-in is in state `pending-confirm` (i.e. all necessary information about the end-user has already been collected), this call confirms that the opt-in should be activated for billing (after a successful call, optin-status should be `active`).</documentation>
+      <input message="wsdl:POST_confirmOptin_InputMessage" />
+      <output message="wsdl:POST_confirmOptin_OutputMessage">
+        <documentation />
+      </output>
+    </operation>
+    <operation name="POST_cancelOptin">
+      <documentation>The purpose of the ‘cancel-optin’ API is for deactivating the consumer’s opt-in stored by Boku and the issuer.
+
+A merchant can use this method in the following possible scenarios:
+
+* User contacts the merchant requesting to remove their payment method
+* Merchant determines that the consumer’s billing account has encountered a permanent error   that should not be retried in the future
+
+A cancel-optin request **must** be sent when a user removes the payment method from the merchant account. Various payment methods enforce a 1:1 mapping, that is, a single payment method account can only be associated to a single merchant account. In the case that the merchant does not call cancel-optin, a user would be unable to associate their payment method account with any other merchant account, even though the user has already requested to remove the payment method from the merchant account.
+
+The 'optin-id' received from the 'optin' request at the time the consumer added their payment method must be supplied in the 'cancel-optin' request.</documentation>
+      <input message="wsdl:POST_cancelOptin_InputMessage" />
+      <output message="wsdl:POST_cancelOptin_OutputMessage">
+        <documentation />
+      </output>
+    </operation>
+  </portType>
+  <binding name="Boku_x0020_Direct_x0020_Payments_x0020_API_Binding" type="wsdl:Boku_x0020_Direct_x0020_Payments_x0020_API_PortType">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+    <operation name="POST_optin">
+      <soap:operation soapAction="POST_optin" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+      <input>
+        <soap:body use="literal" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+      </input>
+      <output>
+        <soap:body use="literal" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+      </output>
+    </operation>
+    <operation name="POST_validateOptin">
+      <soap:operation soapAction="POST_validateOptin" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+      <input>
+        <soap:body use="literal" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+      </input>
+      <output>
+        <soap:body use="literal" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+      </output>
+    </operation>
+    <operation name="POST_confirmOptin">
+      <soap:operation soapAction="POST_confirmOptin" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+      <input>
+        <soap:body use="literal" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+      </input>
+      <output>
+        <soap:body use="literal" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+      </output>
+    </operation>
+    <operation name="POST_cancelOptin">
+      <soap:operation soapAction="POST_cancelOptin" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+      <input>
+        <soap:body use="literal" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+      </input>
+      <output>
+        <soap:body use="literal" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+      </output>
+    </operation>
+  </binding>
+  <service name="Boku_x0020_Direct_x0020_Payments_x0020_API">
+    <documentation>## API Security
+
+Security is a significant consideration for payment platforms. As part of the registration process for each registered merchant account, merchants receive a security key used to authenticate communications in either direction.
+
+Developers should consult the [Boku API Signature Authentication Guide](page:guides/api-signature-authentication-guide) for additional details with respect to implementing security on the Boku APIs.
+
+## API Usage
+
+When a consumer chooses to use a local payment-method (wallet), the consumer must go through an 'optin' flow to authenticate. This is accomplished using a redirect to the issuer's app or website where the consumer authenticates and completes the opt-in process.
+
+After the consumer adds their local payment-method (wallet), as their registered payment method, the 'charge' method is used to charge the consumer's local payment-method.
+
+If a customer decides to refund a transaction, the 'refund-charge' method can be used to refund the transaction.
+
+## API Versioning
+
+The Boku Payment Gateway API is versioned to provide support for changes to functionality without affecting existing integrations.  Each API URL includes version information that enables distinct functionality across different versions.
+
+There are several types of changes that could result in a new API version:
+
+1. New API functionality – new APIs, new parameters, additional information in responses, improved error reporting.
+2. Deprecated API functionality – deprecated APIs, deprecated parameters, deprecated error messages.
+3. Changes in functionality – existing functional behavior changes such as the returned result of a call. A warning is changed to an error.  Validation becomes stricter or more lenient.
+
+In these cases, Boku will release a new API version through a new endpoint(s). When new versions of existing APIs are added, support for existing versions is maintained.  Unless otherwise stated, as a rule, compatibility is maintained across versions.  Prior supported endpoints should have unchanged behavior. If an API is deprecated and scheduled to be removed, a notice of not less than 6 months will be given.  Requests for extensions to this period can be considered.
+
+Boku may make changes to the API within an existing version without changing the version number. An example of a non-versioning change would be the addition of an optional field to a request or to a response.
+
+## API Calls
+
+### URL Scheme
+
+All the below API calls are against URLs that follow the pattern,
+
+``
+https://${api-node}.boku.com/${api-family}/${api-version}/${api-call}
+``
+
+Definitions for the above placeholders:
+
+* **api-node**: This follows the pattern '${country}-api4' (e.g. 'us-api4').
+    * 'country' is the two letter country code of the end-user's payment-method against which the call is made.
+    * The country code is required and is used for more efficient routing of the request.
+    * The country code in the url must match the country code supplied in the `optin-request`.`country` element.
+* **api-family**: Groups a family of related API methods.
+    * In this API, family is either one of:
+        * 'optin' - For interacting with the user or handset to obtain billing approval.
+        * 'billing' - For actually performing billing operations against the user.
+* **api-version**: In this version of the API, this value is always the string '3.0'.
+    * Calls under different version numbers may be used in the future to introduce non-compatible API changes.
+* **api-call**: The name particular API call or method to invoke, for example 'charge' or 'refund-charge'.
+    * This usually matches the XML root element name, sans the '-request' suffix.
+
+Fully qualified API call URLs are documented with each of the example calls detailed below.
+</documentation>
+    <port name="default_Port" binding="wsdl:Boku_x0020_Direct_x0020_Payments_x0020_API_Binding">
+      <soap:address location="https://jp-api4-stage.boku.com" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+    </port>
+  </service>
+</definitions>

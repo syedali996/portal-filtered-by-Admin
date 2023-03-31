@@ -1,0 +1,122 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_source": "apimatic.transformer",
+  "resources": [
+    {
+      "name": "Boku Direct Payments API",
+      "_type": "workspace",
+      "_id": "wrk_acf81d96316d498b8795a95aa655c700",
+      "description": "## API Security\n\nSecurity is a significant consideration for payment platforms. As part of the registration process for each registered merchant account, merchants receive a security key used to authenticate communications in either direction.\n\nDevelopers should consult the [Boku API Signature Authentication Guide](page:guides/api-signature-authentication-guide) for additional details with respect to implementing security on the Boku APIs.\n\n## API Usage\n\nWhen a consumer chooses to use a local payment-method (wallet), the consumer must go through an 'optin' flow to authenticate. This is accomplished using a redirect to the issuer's app or website where the consumer authenticates and completes the opt-in process.\n\nAfter the consumer adds their local payment-method (wallet), as their registered payment method, the 'charge' method is used to charge the consumer's local payment-method.\n\nIf a customer decides to refund a transaction, the 'refund-charge' method can be used to refund the transaction.\n\n## API Versioning\n\nThe Boku Payment Gateway API is versioned to provide support for changes to functionality without affecting existing integrations.  Each API URL includes version information that enables distinct functionality across different versions.\n\nThere are several types of changes that could result in a new API version:\n\n1. New API functionality – new APIs, new parameters, additional information in responses, improved error reporting.\n2. Deprecated API functionality – deprecated APIs, deprecated parameters, deprecated error messages.\n3. Changes in functionality – existing functional behavior changes such as the returned result of a call. A warning is changed to an error.  Validation becomes stricter or more lenient.\n\nIn these cases, Boku will release a new API version through a new endpoint(s). When new versions of existing APIs are added, support for existing versions is maintained.  Unless otherwise stated, as a rule, compatibility is maintained across versions.  Prior supported endpoints should have unchanged behavior. If an API is deprecated and scheduled to be removed, a notice of not less than 6 months will be given.  Requests for extensions to this period can be considered.\n\nBoku may make changes to the API within an existing version without changing the version number. An example of a non-versioning change would be the addition of an optional field to a request or to a response.\n\n## API Calls\n\n### URL Scheme\n\nAll the below API calls are against URLs that follow the pattern,\n\n``\nhttps://${api-node}.boku.com/${api-family}/${api-version}/${api-call}\n``\n\nDefinitions for the above placeholders:\n\n* **api-node**: This follows the pattern '${country}-api4' (e.g. 'us-api4').\n    * 'country' is the two letter country code of the end-user's payment-method against which the call is made.\n    * The country code is required and is used for more efficient routing of the request.\n    * The country code in the url must match the country code supplied in the `optin-request`.`country` element.\n* **api-family**: Groups a family of related API methods.\n    * In this API, family is either one of:\n        * 'optin' - For interacting with the user or handset to obtain billing approval.\n        * 'billing' - For actually performing billing operations against the user.\n* **api-version**: In this version of the API, this value is always the string '3.0'.\n    * Calls under different version numbers may be used in the future to introduce non-compatible API changes.\n* **api-call**: The name particular API call or method to invoke, for example 'charge' or 'refund-charge'.\n    * This usually matches the XML root element name, sans the '-request' suffix.\n\nFully qualified API call URLs are documented with each of the example calls detailed below.\n"
+    },
+    {
+      "name": "production",
+      "data": {
+        "default": "https://jp-api4-stage.boku.com"
+      },
+      "_type": "environment",
+      "_id": "env_b17d30fc39114d94905d02eca4b325da",
+      "parentId": "wrk_acf81d96316d498b8795a95aa655c700"
+    },
+    {
+      "name": "environment2",
+      "data": {
+        "default": "https://jp-api4.boku.com"
+      },
+      "_type": "environment",
+      "_id": "env_ef071425034f4d8a83c5f96df891d344",
+      "parentId": "wrk_acf81d96316d498b8795a95aa655c700"
+    },
+    {
+      "name": "Consumer Registration",
+      "_type": "request_group",
+      "_id": "fld_c4a12b8925f94b49a440457880a1c0f2",
+      "parentId": "wrk_acf81d96316d498b8795a95aa655c700",
+      "description": "These methods are used to obtain consumer approval to register a local payment-method as a payment method. A successful 'optin' sequence results in a registered local payment method with a merchant.\n\n#### Opt-in Hosted\n\n| Step | Description | API |\n|------|-------------|-----|\n| 1 | Consumer comes into merchant from a country that has a local payment method(wallet) as a payment option. | |\n| 2 | Merchant collects payment-method (wallet) from consumer | |\n| 3 | Merchant sends the request to Boku to collect an approval (opt-in) from the consumer for payments | 'optin' API method |\n| 4 | Boku returns an optin URL to the merchant, to which a consumer must be redirected | |\n| 5 | Consumer completes the optin process on the issuer's app or website | |\n| 6 | Merchant polls Boku to retrieve the identity of the consumer | 'validate-optin' API method |\n| 7 | Merchant sends the confirmation to Boku to complete consumer authentication | 'confirm-optin' API method |\n| 8 | Boku responds with authentication success or failure. | |\n\n#### Cancel Opt-in\n\n| Step | Description | API |\n|------|-------------|-----|\n| 1 | Merchant sends the request to Boku to cancel a previously collected opt-in. Remove a payment method. | 'cancel-optin' API method |\n| 2 | Boku responds with success or failure | |\n\n#### Hosted opt-in consumer redirection\n\nWhen using an optin-type of hosted, the consumer must be redirected to the optin-url provided in the 'optin' response. The UI presented to the consumer will guide them through the authentication process.\n\nUpon completing authentication, the consumer will be redirected to the forward-url provided in the 'optin' request. A follow-up `validate-optin` call must be made in order to verify that the authentication succeeded.\n"
+    },
+    {
+      "name": "optin",
+      "method": "POST",
+      "url": "{{default}}/optin/3.0/optin",
+      "body": {
+        "mimeType": "application/xml",
+        "text": "<optin-request>\r\n  <country>JP</country>\r\n  <merchant-id>gatewaymerchant</merchant-id>\r\n  <merchant-request-id>2032405</merchant-request-id>\r\n  <payment-method>superwallet</payment-method>\r\n  <optin-type>hosted</optin-type>\r\n  <hosted>\r\n    <forward-url>https://merchant.com/redirect/2032405</forward-url>\r\n  </hosted>\r\n  <seller-of-record>\r\n    <id>73tdolramou0m6jnqyb6pkk3</id>\r\n  </seller-of-record>\r\n</optin-request>"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/xml",
+          "disabled": false
+        }
+      ],
+      "authentication": {},
+      "_type": "request",
+      "_id": "req_49b58ee979a7452ebde2d87c116f3130",
+      "parentId": "fld_c4a12b8925f94b49a440457880a1c0f2",
+      "description": "The 'optin' call initiates the consumer authentication process. After an `optin` call, an opt-in is usually in status `pending-validate`.\n\nThe optin call types are\n\n* 'hosted' - redirect the consumer to an issuer-provided UI to perform verification.\n\nThe 'optin' call is used in conjunction with the following related methods in order to complete consumer approval:\n\n* 'validate-optin' - identify and validate the billing account the consumer is registering as   their payment method.\n* 'confirm-optin' - confirm that the associated 'optin' should be activated for billing.\n\nIt is possible to restrict an optin to be used for a single charge by specifying the 'terms' element. When provided, the system will only allow a single 'charge' request to be made for this optin."
+    },
+    {
+      "name": "validateOptin",
+      "method": "POST",
+      "url": "{{default}}/optin/3.0/validate-optin",
+      "body": {
+        "mimeType": "application/xml",
+        "text": "<validate-optin-request>\r\n  <merchant-id>gatewaymerchant</merchant-id>\r\n  <merchant-request-id>2032405</merchant-request-id>\r\n  <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>\r\n  <optin-type>hosted</optin-type>\r\n</validate-optin-request>"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/xml",
+          "disabled": false
+        }
+      ],
+      "authentication": {},
+      "_type": "request",
+      "_id": "req_00a40049144441e1b938e420c1472aa6",
+      "parentId": "fld_c4a12b8925f94b49a440457880a1c0f2",
+      "description": "The main purpose of an opt-in is to identify and verify the payment method that the end-user wants to register. In the process, the user confirms that they have control over the corresponding payment method. Once an opt-in has begun via an `optin` API call, the `validate-optin` call is used to complete this verification and in most cases retrieve the end-user details such as the account identifier of the user.\n\nSpecifically\n\n* **hosted**: Confirm successful authentication via opt-in UI, and retrieve the account   identifier of the user.\n\nAfter a successful `validate-optin` call, an opt-in should usually be in status `pending-confirm` awaiting a call to `confirm-optin`."
+    },
+    {
+      "name": "confirmOptin",
+      "method": "POST",
+      "url": "{{default}}/optin/3.0/confirm-optin",
+      "body": {
+        "mimeType": "application/xml",
+        "text": "<confirm-optin-request>\r\n  <merchant-id>gatewaymerchant</merchant-id>\r\n  <merchant-request-id>1002004</merchant-request-id>\r\n  <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>\r\n</confirm-optin-request>"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/xml",
+          "disabled": false
+        }
+      ],
+      "authentication": {},
+      "_type": "request",
+      "_id": "req_e29ace7fb5544df3889cdada10f3de62",
+      "parentId": "fld_c4a12b8925f94b49a440457880a1c0f2",
+      "description": "Assuming an opt-in is in state `pending-confirm` (i.e. all necessary information about the end-user has already been collected), this call confirms that the opt-in should be activated for billing (after a successful call, optin-status should be `active`)."
+    },
+    {
+      "name": "cancelOptin",
+      "method": "POST",
+      "url": "{{default}}/optin/3.0/cancel-optin",
+      "body": {
+        "mimeType": "application/xml",
+        "text": "<cancel-optin-request>\r\n  <merchant-id>gatewaymerchant</merchant-id>\r\n  <merchant-request-id>1002006</merchant-request-id>\r\n  <optin-id>IVXecDoa2f6Y3oOqp1f7</optin-id>\r\n</cancel-optin-request>"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/xml",
+          "disabled": false
+        }
+      ],
+      "authentication": {},
+      "_type": "request",
+      "_id": "req_2cfcae6c83fb47688dd589c64c167510",
+      "parentId": "fld_c4a12b8925f94b49a440457880a1c0f2",
+      "description": "The purpose of the ‘cancel-optin’ API is for deactivating the consumer’s opt-in stored by Boku and the issuer.\n\nA merchant can use this method in the following possible scenarios:\n\n* User contacts the merchant requesting to remove their payment method\n* Merchant determines that the consumer’s billing account has encountered a permanent error   that should not be retried in the future\n\nA cancel-optin request **must** be sent when a user removes the payment method from the merchant account. Various payment methods enforce a 1:1 mapping, that is, a single payment method account can only be associated to a single merchant account. In the case that the merchant does not call cancel-optin, a user would be unable to associate their payment method account with any other merchant account, even though the user has already requested to remove the payment method from the merchant account.\n\nThe 'optin-id' received from the 'optin' request at the time the consumer added their payment method must be supplied in the 'cancel-optin' request."
+    }
+  ]
+}
